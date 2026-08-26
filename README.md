@@ -315,6 +315,7 @@ Cualquier persona del equipo puede contribuir al proyecto, siempre dentro del fl
 ## Documentación adicional
 
 - Documentación funcional original del proyecto (requerimientos, casos de uso, diagramas UML, mockups): ver documento de análisis y diseño de LUDEBRA Labs compartido por el equipo.
+- Integración, API y validación pendiente del [Módulo 4 — Evaluación y Seguimiento](docs/modulo-4-evaluacion-seguimiento.md).
 - Cada app (`apps/backend`, `apps/frontend`) mantiene su propio `README.md` con detalles específicos de configuración y ejecución.
 
 ## Equipo
