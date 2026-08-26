@@ -1,1 +1,237 @@
 @import "tailwindcss";
+
+@theme {
+  --font-display: "Source Serif 4", "Georgia", serif;
+  --font-headline: "Hanken Grotesk", "Inter", sans-serif;
+  --font-body: "Hanken Grotesk", "Inter", sans-serif;
+  --font-label: "Hanken Grotesk", "JetBrains Mono", monospace;
+
+  --font-size-display-lg: 3rem;
+  --font-size-display: 2.25rem;
+  --font-size-headline-lg: 1.5rem;
+  --font-size-headline: 1.25rem;
+  --font-size-headline-sm: 1.125rem;
+  --font-size-body-lg: 1rem;
+  --font-size-body: 0.875rem;
+  --font-size-body-sm: 0.75rem;
+  --font-size-label-lg: 0.75rem;
+  --font-size-label: 0.6875rem;
+  --font-size-label-sm: 0.625rem;
+  --font-size-overline: 0.5625rem;
+
+  --spacing-2xs: 0.25rem;
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.25rem;
+  --spacing-xl: 1.5rem;
+  --spacing-2xl: 2rem;
+  --spacing-3xl: 2.5rem;
+  --spacing-4xl: 3rem;
+
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
+
+  --shadow-surface: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-elevated: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-modal: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+
+  --color-primary: #0a1f2e;
+  --color-primary-light: #1a3a4a;
+  --color-primary-faded: #0d2938;
+  --color-primary-container: #1e3741;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #a8d8ea;
+  --color-on-primary-fixed: #c5e4f0;
+  --color-on-primary-fixed-variant: #7fb8d0;
+  --color-primary-fixed: #c5e4f0;
+  --color-primary-fixed-variant: #7fb8d0;
+
+  --color-secondary: #00afeb;
+  --color-secondary-light: #33c1f0;
+  --color-secondary-container: #cceaf7;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #004d66;
+  --color-on-secondary-fixed: #004d66;
+  --color-secondary-fixed: #cceaf7;
+
+  --color-tertiary: #301908;
+  --color-tertiary-container: #482e1b;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #ffdac2;
+
+  --color-surface: #faf9f9;
+  --color-surface-dim: #e8e6e3;
+  --color-surface-accent: #ffffff;
+  --color-surface-bright: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f4f2ef;
+  --color-surface-container: #eeecea;
+  --color-surface-container-high: #e3e1de;
+  --color-surface-variant: #e8e6e3;
+  --color-on-surface: #1c1917;
+  --color-on-surface-variant: #77706a;
+
+  --color-outline: #90908a;
+  --color-outline-variant: #e2e0dc;
+
+  --color-border: #d6d3d1;
+  --color-text: #1c1917;
+  --color-text-secondary: #44403c;
+
+  --color-success-green: #16a34a;
+  --color-cian-blue: #00afeb;
+
+  --color-state-success: #16a34a;
+  --color-state-success-container: #dcfce7;
+  --color-state-error: #dc2626;
+  --color-state-error-container: #fef2f2;
+  --color-state-warning: #f59e0b;
+  --color-state-warning-container: #fffbeb;
+  --color-state-info: #2563eb;
+  --color-state-info-container: #eff6ff;
+}
+
+/* Portada/Login variant — precision_2 tokens */
+.theme-precision-2 {
+  --font-body: "Inter", sans-serif;
+  --font-label: "JetBrains Mono", monospace;
+  --color-surface: #f7fafc;
+  --color-surface-dim: #e2e8f0;
+  --color-tertiary: #192022;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-xl);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+
+/* Material Symbols */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.material-symbols-outlined.fill {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Shadows */
+.shadow-level-1 {
+  box-shadow: 0px 4px 20px rgba(30, 55, 65, 0.05);
+}
+.shadow-level-2 {
+  box-shadow: 0px 8px 32px rgba(30, 55, 65, 0.12);
+}
+.shadow-subtle {
+  box-shadow: 0px 2px 12px rgba(30, 55, 65, 0.04);
+}
+.shadow-hover {
+  box-shadow: 0px 4px 16px rgba(30, 55, 65, 0.12);
+}
+
+/* Glass effects */
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0px 2px 12px rgba(30, 55, 65, 0.04);
+}
+.glass-panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0px 8px 32px rgba(30, 55, 65, 0.12);
+}
+.ghost-outline {
+  border: 1px solid #e2e8f0;
+}
+
+/* Hover lift */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 16px rgba(30, 55, 65, 0.08);
+}
+
+/* Button utilities */
+.btn-primary {
+  background-color: #00afeb;
+  color: #ffffff;
+  border-radius: 8px;
+  transition: transform 0.2s;
+}
+.btn-primary:active {
+  transform: scale(0.98);
+}
+.btn-secondary {
+  border: 1.5px solid #1e3741;
+  color: #1e3741;
+  border-radius: 8px;
+  background: transparent;
+}
+
+/* Input utility */
+.input-field {
+  border: 1px solid #eaf1f4;
+  border-radius: 8px;
+  background-color: #f7faffc;
+}
+.input-field:focus {
+  outline: none;
+  border-color: #00afeb;
+  box-shadow: 0 0 0 2px rgba(0, 175, 235, 0.2);
+}
+
+/* Drag & Drop */
+.drag-drop-zone {
+  border: 2px dashed #eaf1f4;
+  background-color: #f7fafc;
+  transition: all 0.3s ease;
+}
+.drag-drop-zone.dragover {
+  border-color: #00afeb;
+  background-color: rgba(0, 175, 235, 0.05);
+}
+
+/* Background patterns */
+.circuit-pattern {
+  background-image: radial-gradient(circle at 100% 150%, var(--color-primary-container) 24%, transparent 25%),
+    radial-gradient(circle at 0% 150%, var(--color-primary-container) 24%, transparent 25%);
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
+  opacity: 0.05;
+}
+.pattern-bg {
+  background-color: #1e3741;
+  background-image: radial-gradient(#324a55 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.bg-pattern {
+  background-image: radial-gradient(var(--color-outline-variant) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: -12px -12px;
+}
