@@ -1,5 +1,5 @@
-import { Simulator } from "src/simulators/entities/simulator.entity";
-import { State } from "src/states/entities/state.entity";
+import { Simulator } from '../../simulators/entities/simulator.entity';
+import { State } from '../../states/entities/state.entity';
 import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('tasks')

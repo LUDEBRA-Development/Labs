@@ -79,7 +79,7 @@ Labs/
 | Backend | NestJS 11, Node.js |
 | Frontend | React 19, Vite, React Router, Tailwind CSS 4 |
 | Control de versiones | Git + Gitflow |
-| Base de datos / ORM | *Por definir — se documentará aquí cuando se incorpore* |
+| Base de datos / ORM | MySQL + TypeORM |
 
 > Este proyecto reemplaza el stack original (React + JavaScript sin monorepo, sin backend propio documentado) por una arquitectura tipada y modular pensada para escalar en equipo.
 
@@ -174,9 +174,18 @@ Cada app que las necesite tendrá su propio archivo de ejemplo (`.env.example`) 
 
 ```bash
 cp apps/backend/.env.example apps/backend/.env
+cp apps/frontend/.env.example apps/frontend/.env
 ```
 
-> Se actualizará esta sección con las variables reales a medida que se agreguen (conexión a base de datos, puertos, claves, etc.).
+Configura en el backend la conexión MySQL (`MYSQL_HOST`, `MYSQL_PORT`,
+`MYSQL_DATABASE`, `MYSQL_USER` y `MYSQL_PASSWORD`). El frontend usa
+`VITE_API_URL` para localizar la API.
+
+Después de configurar la base de datos, aplica las migraciones pendientes:
+
+```bash
+pnpm --filter backend migration:run
+```
 
 ### 5. Levantar el proyecto en desarrollo
 
