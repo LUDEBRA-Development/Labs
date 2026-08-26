@@ -36,3 +36,9 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Docker local
+docker-compose.yml
+
+# DB init scripts
+scripts/
