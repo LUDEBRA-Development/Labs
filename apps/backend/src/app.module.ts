@@ -4,6 +4,7 @@ import { ConfigModuleSetup, DatabaseConfig } from './config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { StatesModule } from './states/states.module';
+import { CoursesModule } from './courses/courses.module';
 
 // app.module.ts
 @Module({
@@ -28,6 +29,7 @@ import { StatesModule } from './states/states.module';
     }),
     TasksModule,
     StatesModule,
+    CoursesModule,
   ],
 })
 export class AppModule {}
