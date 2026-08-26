@@ -5,9 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { StatesModule } from './states/states.module';
 import { CoursesModule } from './courses/courses.module';
-import { ScheduleModule } from '@nestjs/schedule';
 import { UserTasksModule } from './user-tasks/user-tasks.module';
-import { NotificationsModule } from './notifications/notifications.module';
 
 // app.module.ts
 @Module({
@@ -30,12 +28,10 @@ import { NotificationsModule } from './notifications/notifications.module';
         };
       },
     }),
-    ScheduleModule.forRoot(),
     TasksModule,
     StatesModule,
     CoursesModule,
     UserTasksModule,
-    NotificationsModule,
   ],
 })
 export class AppModule {}

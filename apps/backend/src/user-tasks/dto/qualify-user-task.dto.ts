@@ -6,13 +6,13 @@ import {
   Min,
 } from 'class-validator';
 
-export class GradeTaskDto {
+export class QualifyUserTaskDto {
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
   qualification!: number;
 
   @IsString()
   @IsNotEmpty()
-  @MaxLength(4000)
-  feedbackComment!: string;
+  @MaxLength(500)
+  feedbackComments!: string;
 }

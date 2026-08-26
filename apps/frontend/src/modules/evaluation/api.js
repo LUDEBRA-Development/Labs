@@ -21,42 +21,29 @@ async function request(path, options = {}) {
   return response.json();
 }
 
-export function submitTask(taskId, payload) {
-  return request(`/user-tasks/${taskId}/deliver`, {
+export function submitTask(payload) {
+  return request("/user-tasks", {
     method: "POST",
     body: JSON.stringify(payload),
   });
 }
 
 export function getStudentHistory(emailUser) {
-  return request(`/user-tasks/users/${encodeURIComponent(emailUser)}/history`);
+  const params = new URLSearchParams({ email: emailUser });
+  return request(`/user-tasks?${params.toString()}`);
 }
 
 export function getTaskDeliveries(taskId) {
-  return request(`/user-tasks/tasks/${taskId}`);
+  const params = new URLSearchParams({ taskId: String(taskId) });
+  return request(`/user-tasks?${params.toString()}`);
 }
 
-export function gradeTask(taskId, emailUser, payload) {
+export function qualifyTask(taskId, emailUser, payload) {
   return request(
-    `/user-tasks/${taskId}/users/${encodeURIComponent(emailUser)}/grade`,
+    `/user-tasks/${taskId}/${encodeURIComponent(emailUser)}/qualification`,
     {
       method: "PATCH",
       body: JSON.stringify(payload),
     },
   );
-}
-
-export function getTeacherNotifications(recipientEmail, onlyUnread = false) {
-  const params = new URLSearchParams({
-    recipientEmail,
-    onlyUnread: String(onlyUnread),
-  });
-  return request(`/notifications?${params.toString()}`);
-}
-
-export function markNotificationAsRead(idNotification, recipientEmail) {
-  return request(`/notifications/${idNotification}/read`, {
-    method: "PATCH",
-    body: JSON.stringify({ recipientEmail }),
-  });
 }

@@ -1,122 +1,105 @@
 # Módulo 4 — Evaluación y Seguimiento
 
-## Estado actual
+## Alcance
 
-El módulo está implementado en la rama `feat/evaluacion-seguimiento`. Puede
-compilarse y probarse sin una base de datos mediante pruebas unitarias, pero la
-validación integral queda pendiente hasta que el equipo entregue una instancia
-MySQL y confirme el modelo definitivo de usuarios, cursos y matrículas.
+Este módulo trabaja exclusivamente con la tabla `User_tasks` existente en
+MySQL. No crea tablas, no altera el esquema y no implementa notificaciones.
+TypeORM permanece configurado con `synchronize: false`.
 
-## Funcionalidad implementada
+La funcionalidad cubierta es:
 
-- Registrar una entrega de estudiante antes o exactamente en la fecha límite.
-- Rechazar entregas vencidas y entregas duplicadas.
-- Registrar calificación, fecha de calificación y retroalimentación docente.
-- Impedir la calificación cuando no existe una entrega previa.
-- Impedir calificaciones superiores al puntaje máximo de la actividad.
-- Consultar el historial de un estudiante y las entregas de una actividad.
-- Crear un recordatorio interno para el docente cuando vence una actividad.
-- Marcar los recordatorios como leídos.
+- Registrar la entrega de una actividad antes de su fecha límite.
+- Rechazar entregas vencidas y duplicadas.
+- Calificar únicamente entregas que ya tienen `Delivery_date`.
+- Registrar calificación, fecha de calificación y retroalimentación.
+- Consultar entregas por estudiante o actividad.
 
-## Modelo de datos
+## Tabla existente
 
-La migración `1787702400000-create-evaluation-tracking.ts` crea las tablas
-`User_tasks` y `notifications`.
+La entidad TypeORM representa el siguiente esquema acordado con el equipo:
 
-### `User_tasks`
+| Columna | Tipo | Uso |
+|---|---|---|
+| `email_User` | `VARCHAR(100)` | Correo del estudiante y parte de la clave primaria. |
+| `Id_task` | `INT` | Actividad y parte de la clave primaria. Referencia `tasks.Id_task`. |
+| `Qualification` | `DECIMAL(4,2) NULL` | Calificación asignada por el docente. |
+| `Delivery_date` | `DATETIME NULL` | Fecha de entrega generada por el servidor. |
+| `Qualification_date` | `DATETIME NULL` | Fecha de calificación generada por el servidor. |
+| `Feedback_comments` | `VARCHAR(500) NULL` | Retroalimentación docente. |
+| `Comment` | `VARCHAR(500) NULL` | Comentario opcional del estudiante. |
 
-| Columna | Uso |
-|---|---|
-| `email_User` | Correo del estudiante. Forma parte de la clave primaria. |
-| `Id_task` | Actividad entregada. Forma parte de la clave primaria y referencia `tasks.Id_task`. |
-| `Qualification` | Calificación, inicialmente nula. |
-| `Delivery_date` | Fecha real de entrega. |
-| `Qualification_date` | Fecha en la que el docente calificó. |
-| `Feedback_comment` | Retroalimentación obligatoria al calificar. |
-| `Comment` | Comentario opcional del estudiante. |
+La clave primaria compuesta (`email_User`, `Id_task`) impide registrar dos
+filas para el mismo estudiante y actividad.
 
-La clave compuesta (`email_User`, `Id_task`) impide que un estudiante registre
-dos entregas para la misma actividad.
+Aunque MySQL contiene una clave foránea hacia `Users.Email`, todavía no se
+modela una relación TypeORM con usuarios porque ese módulo no existe en el
+código. La relación con `Task` sí se encuentra modelada.
 
-### `notifications`
+## API
 
-Guarda recordatorios internos por actividad, destinatario, tipo y fecha límite.
-También conserva el número de entregas y cuántas estaban pendientes de
-calificar cuando se creó el aviso.
+La URL local predeterminada es `http://localhost:3000`.
 
-El backend revisa cada minuto las actividades vencidas. Si estuvo detenido en
-el momento exacto del vencimiento, generará el recordatorio cuando vuelva a
-estar disponible.
+### Registrar entrega
 
-## API disponible
-
-La URL base local predeterminada es `http://localhost:3000`.
-
-### Registrar una entrega
-
-`POST /user-tasks/:taskId/deliver`
+`POST /user-tasks`
 
 ```json
 {
   "emailUser": "estudiante@ejemplo.com",
+  "idTask": 12,
   "comment": "Resultados de la práctica"
 }
 ```
 
-### Calificar una entrega
+`Delivery_date` se genera con la fecha del servidor. La entrega se rechaza si
+la tarea no existe, está vencida o la clave compuesta ya está registrada.
 
-`PATCH /user-tasks/:taskId/users/:emailUser/grade`
+### Calificar entrega
+
+`PATCH /user-tasks/:idTask/:emailUser/qualification`
 
 ```json
 {
   "qualification": 4.5,
-  "feedbackComment": "Buen procedimiento; revisa las unidades del resultado."
+  "feedbackComments": "Buen procedimiento; revisa las unidades."
 }
 ```
 
-### Consultas
+`Qualification_date` se genera con la fecha del servidor. La operación se
+rechaza si no existe una fila con `Delivery_date` o si la calificación supera
+el `Max_score` de la tarea.
 
-- `GET /user-tasks/users/:emailUser/history`: historial del estudiante.
-- `GET /user-tasks/tasks/:taskId`: entregas de una actividad.
-- `GET /user-tasks/:taskId/users/:emailUser`: entrega individual.
-- `GET /notifications?recipientEmail=:email&onlyUnread=true`: recordatorios del docente.
-- `PATCH /notifications/:id/read`: marca un recordatorio como leído; recibe
-  `recipientEmail` en el cuerpo.
+### Consultar por actividad
 
-## Decisiones pendientes con los otros módulos
+`GET /user-tasks?taskId=12`
 
-Antes de integrar a `develop`, el equipo debe confirmar:
+### Consultar por estudiante
 
-1. Si Personas conservará el correo como identificador o tendrá un identificador
-   interno. Actualmente `email_User` todavía no tiene clave foránea porque el
-   Módulo 1 no está disponible.
-2. Cómo se obtendrá el docente responsable. Actualmente `tasks.created_by` se
-   trata como un correo y la creación de tareas usa temporalmente
-   `docente@ejemplo.com`.
-3. Cómo se comprobará que el estudiante está matriculado en el curso asociado a
-   la actividad.
-4. Si toda actividad debe tener una fecha límite obligatoria. El modelo actual
-   permite que `Expiration_date` sea nula.
-5. La zona horaria oficial para almacenar y comparar fechas. Se recomienda
-   guardar en UTC y convertir a `America/Bogota` únicamente para mostrarla.
-6. Quién ejecutará las migraciones en desarrollo, pruebas y producción.
+`GET /user-tasks?email=estudiante%40ejemplo.com`
 
-Cuando exista autenticación, el correo del estudiante o docente deberá salir de
-la sesión iniciada y no de parámetros escritos manualmente en la interfaz.
+Ambos filtros también pueden combinarse. La petición se rechaza si no se
+proporciona ninguno.
 
-## Validación cuando MySQL esté disponible
+## Integraciones pendientes
 
-1. Copiar `apps/backend/.env.example` como `apps/backend/.env` y completar las
-   credenciales.
-2. Ejecutar `pnpm --filter backend migration:run` desde la raíz.
-3. Confirmar la creación de `User_tasks` y `notifications`, sus claves y la
-   relación con `tasks`.
-4. Probar una entrega antes de vencer, una entrega vencida y una duplicada.
-5. Probar que no se pueda calificar sin entrega ni superar `Max_score`.
-6. Calificar una entrega y comprobar el historial con la retroalimentación.
-7. Crear una actividad que venza en pocos minutos y comprobar que aparezca un
-   único recordatorio para el docente.
-8. Ejecutar las pruebas y compilaciones de backend y frontend.
+Cuando estén disponibles los demás módulos se deberá:
 
-La migración se revierte con `pnpm --filter backend migration:revert` únicamente
-en entornos donde sea seguro eliminar las tablas del módulo.
+1. Obtener el correo del estudiante desde la sesión autenticada al entregar.
+2. Verificar que el estudiante esté matriculado en el curso de la actividad.
+3. Verificar que el usuario que califica sea el docente responsable.
+4. Confirmar la política común de zona horaria para las fechas del servidor y
+   MySQL.
+
+## Validación con MySQL
+
+Cuando el equipo entregue las credenciales:
+
+1. Copiar `apps/backend/.env.example` como `apps/backend/.env` y completar la
+   conexión.
+2. Iniciar backend y frontend sin activar `synchronize`.
+3. Confirmar que TypeORM reconoce `User_tasks` sin intentar modificarla.
+4. Probar una entrega válida, una vencida y una duplicada.
+5. Probar que no se pueda calificar sin `Delivery_date`.
+6. Probar una calificación válida y otra superior a `Max_score`.
+7. Consultar los historiales por correo y por actividad.
+8. Ejecutar pruebas, lint y compilación antes del Pull Request.

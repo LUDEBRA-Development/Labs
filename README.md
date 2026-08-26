@@ -181,11 +181,9 @@ Configura en el backend la conexión MySQL (`MYSQL_HOST`, `MYSQL_PORT`,
 `MYSQL_DATABASE`, `MYSQL_USER` y `MYSQL_PASSWORD`). El frontend usa
 `VITE_API_URL` para localizar la API.
 
-Después de configurar la base de datos, aplica las migraciones pendientes:
-
-```bash
-pnpm --filter backend migration:run
-```
+La base de datos utiliza un esquema previamente creado por el equipo. El
+backend mantiene `synchronize: false` y no debe regenerar ni modificar sus
+tablas automáticamente.
 
 ### 5. Levantar el proyecto en desarrollo
 
@@ -308,7 +306,7 @@ Cualquier persona del equipo puede contribuir al proyecto, siempre dentro del fl
 - [ ] Módulo 2 — Cursos y Matrícula
 - [ ] Módulo 3 — Contenido y Actividades (incluye catálogo de simuladores)
 - [ ] Módulo 4 — Evaluación y Seguimiento
-- [ ] Definición de base de datos / ORM
+- [x] Definición de base de datos / ORM (MySQL + TypeORM)
 - [ ] Migración de simuladores del proyecto original
 - [ ] CI/CD y despliegue
 

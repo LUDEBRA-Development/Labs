@@ -38,7 +38,7 @@ export function StudentEvaluationPage() {
     setFeedback(null);
 
     try {
-      await submitTask(Number(taskId), { emailUser, comment });
+      await submitTask({ emailUser, idTask: Number(taskId), comment });
       setFeedback({
         type: "success",
         text: "Entrega registrada correctamente.",
@@ -94,7 +94,7 @@ export function StudentEvaluationPage() {
             Comentario de la entrega
             <textarea
               className="mt-2 min-h-32 w-full resize-y rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-              maxLength="2000"
+              maxLength="500"
               value={comment}
               onChange={(event) => setComment(event.target.value)}
             />
@@ -152,12 +152,12 @@ export function StudentEvaluationPage() {
             history.map((delivery) => (
               <article
                 className="rounded-2xl border border-slate-200 p-5"
-                key={`${delivery.emailUser}-${delivery.taskId}`}
+                key={`${delivery.emailUser}-${delivery.idTask}`}
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h3 className="font-semibold text-slate-950">
-                      {delivery.task?.name ?? `Actividad ${delivery.taskId}`}
+                      {delivery.task?.name ?? `Actividad ${delivery.idTask}`}
                     </h3>
                     <p className="mt-1 text-sm text-slate-500">
                       Entregada: {formatDate(delivery.deliveryDate)}
@@ -181,10 +181,10 @@ export function StudentEvaluationPage() {
                     <strong>Tu comentario:</strong> {delivery.comment}
                   </p>
                 )}
-                {delivery.feedbackComment && (
+                {delivery.feedbackComments && (
                   <div className="mt-4 rounded-xl bg-indigo-50 p-4 text-sm text-indigo-950">
                     <strong>Retroalimentación docente:</strong>{" "}
-                    {delivery.feedbackComment}
+                    {delivery.feedbackComments}
                     <p className="mt-1 text-xs text-indigo-700">
                       Calificada: {formatDate(delivery.qualificationDate)}
                     </p>

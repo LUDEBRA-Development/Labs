@@ -5,10 +5,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { Task } from '../tasks/entities/task.entity';
-import { GradeTaskDto } from './dto/grade-task.dto';
-import { SubmitTaskDto } from './dto/submit-task.dto';
+import { CreateUserTaskDto } from './dto/create-user-task.dto';
+import { ListUserTasksDto } from './dto/list-user-tasks.dto';
+import { QualifyUserTaskDto } from './dto/qualify-user-task.dto';
 import { UserTask } from './entities/user-task.entity';
 
 @Injectable()
@@ -20,22 +21,21 @@ export class UserTasksService {
     private readonly taskRepository: Repository<Task>,
   ) {}
 
-  async submit(
-    taskId: number,
-    dto: SubmitTaskDto,
+  async create(
+    dto: CreateUserTaskDto,
     deliveredAt = new Date(),
   ): Promise<UserTask> {
-    const task = await this.findTask(taskId);
+    const task = await this.findTask(dto.idTask);
 
     if (task.expirationDate && deliveredAt > task.expirationDate) {
       throw new BadRequestException(
-        `La tarea ${taskId} venció el ${task.expirationDate.toISOString()}`,
+        `La tarea ${dto.idTask} venció el ${task.expirationDate.toISOString()}`,
       );
     }
 
     const emailUser = this.normalizeEmail(dto.emailUser);
     const existing = await this.userTaskRepository.findOne({
-      where: { emailUser, taskId },
+      where: { emailUser, idTask: dto.idTask },
     });
 
     if (existing) {
@@ -44,34 +44,34 @@ export class UserTasksService {
 
     const delivery = this.userTaskRepository.create({
       emailUser,
-      taskId,
+      idTask: dto.idTask,
       task,
       deliveryDate: deliveredAt,
       qualification: null,
       qualificationDate: null,
-      feedbackComment: null,
+      feedbackComments: null,
       comment: dto.comment?.trim() || null,
     });
 
     return this.userTaskRepository.save(delivery);
   }
 
-  async grade(
-    taskId: number,
+  async qualify(
+    idTask: number,
     emailUser: string,
-    dto: GradeTaskDto,
+    dto: QualifyUserTaskDto,
     qualifiedAt = new Date(),
   ): Promise<UserTask> {
     const delivery = await this.userTaskRepository.findOne({
       where: {
-        taskId,
+        idTask,
         emailUser: this.normalizeEmail(emailUser),
       },
     });
 
     if (!delivery?.deliveryDate) {
-      throw new BadRequestException(
-        'No se puede calificar una actividad que no fue entregada',
+      throw new NotFoundException(
+        'No existe una entrega registrada para calificar',
       );
     }
 
@@ -84,48 +84,40 @@ export class UserTasksService {
 
     delivery.qualification = dto.qualification;
     delivery.qualificationDate = qualifiedAt;
-    delivery.feedbackComment = dto.feedbackComment.trim();
+    delivery.feedbackComments = dto.feedbackComments.trim();
 
     return this.userTaskRepository.save(delivery);
   }
 
-  findHistory(emailUser: string): Promise<UserTask[]> {
+  async findAll(query: ListUserTasksDto): Promise<UserTask[]> {
+    if (query.taskId === undefined && !query.email) {
+      throw new BadRequestException(
+        'Debe proporcionar taskId o email para consultar las entregas',
+      );
+    }
+
+    if (query.taskId !== undefined) {
+      await this.findTask(query.taskId);
+    }
+
+    const where: FindOptionsWhere<UserTask> = {
+      ...(query.taskId !== undefined ? { idTask: query.taskId } : {}),
+      ...(query.email ? { emailUser: this.normalizeEmail(query.email) } : {}),
+    };
+
     return this.userTaskRepository.find({
-      where: { emailUser: this.normalizeEmail(emailUser) },
+      where,
       order: { deliveryDate: 'DESC' },
     });
   }
 
-  async findByTask(taskId: number): Promise<UserTask[]> {
-    await this.findTask(taskId);
-    return this.userTaskRepository.find({
-      where: { taskId },
-      order: { deliveryDate: 'ASC' },
-    });
-  }
-
-  async findOne(taskId: number, emailUser: string): Promise<UserTask> {
-    const delivery = await this.userTaskRepository.findOne({
-      where: {
-        taskId,
-        emailUser: this.normalizeEmail(emailUser),
-      },
-    });
-
-    if (!delivery) {
-      throw new NotFoundException('Entrega no encontrada');
-    }
-
-    return delivery;
-  }
-
-  private async findTask(taskId: number): Promise<Task> {
+  private async findTask(idTask: number): Promise<Task> {
     const task = await this.taskRepository.findOne({
-      where: { idTask: taskId },
+      where: { idTask },
     });
 
     if (!task) {
-      throw new NotFoundException(`Tarea ${taskId} no encontrada`);
+      throw new NotFoundException(`Tarea ${idTask} no encontrada`);
     }
 
     return task;

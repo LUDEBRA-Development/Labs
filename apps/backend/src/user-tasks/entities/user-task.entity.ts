@@ -3,13 +3,13 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity('User_tasks')
 export class UserTask {
-  @PrimaryColumn({ name: 'email_User', type: 'varchar', length: 255 })
+  @PrimaryColumn({ name: 'email_User', type: 'varchar', length: 100 })
   emailUser!: string;
 
   @PrimaryColumn({ name: 'Id_task', type: 'int' })
-  taskId!: number;
+  idTask!: number;
 
-  @ManyToOne(() => Task, { eager: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => Task, { eager: true })
   @JoinColumn({ name: 'Id_task', referencedColumnName: 'idTask' })
   task!: Task;
 
@@ -22,15 +22,20 @@ export class UserTask {
   })
   qualification!: number | null;
 
-  @Column({ name: 'Delivery_date', type: 'datetime' })
-  deliveryDate!: Date;
+  @Column({ name: 'Delivery_date', type: 'datetime', nullable: true })
+  deliveryDate!: Date | null;
 
   @Column({ name: 'Qualification_date', type: 'datetime', nullable: true })
   qualificationDate!: Date | null;
 
-  @Column({ name: 'Feedback_comment', type: 'text', nullable: true })
-  feedbackComment!: string | null;
+  @Column({
+    name: 'Feedback_comments',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
+  feedbackComments!: string | null;
 
-  @Column({ name: 'Comment', type: 'text', nullable: true })
+  @Column({ name: 'Comment', type: 'varchar', length: 500, nullable: true })
   comment!: string | null;
 }

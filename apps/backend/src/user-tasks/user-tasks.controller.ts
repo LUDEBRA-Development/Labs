@@ -6,48 +6,34 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
-import { GradeTaskDto } from './dto/grade-task.dto';
-import { SubmitTaskDto } from './dto/submit-task.dto';
+import { CreateUserTaskDto } from './dto/create-user-task.dto';
+import { ListUserTasksDto } from './dto/list-user-tasks.dto';
+import { QualifyUserTaskDto } from './dto/qualify-user-task.dto';
 import { UserTasksService } from './user-tasks.service';
 
 @Controller('user-tasks')
 export class UserTasksController {
   constructor(private readonly userTasksService: UserTasksService) {}
 
-  @Post(':taskId/deliver')
-  submit(
-    @Param('taskId', ParseIntPipe) taskId: number,
-    @Body() dto: SubmitTaskDto,
-  ) {
-    return this.userTasksService.submit(taskId, dto);
+  @Post()
+  create(@Body() dto: CreateUserTaskDto) {
+    return this.userTasksService.create(dto);
   }
 
-  @Patch(':taskId/users/:emailUser/grade')
-  grade(
-    @Param('taskId', ParseIntPipe) taskId: number,
+  @Patch(':idTask/:emailUser/qualification')
+  qualify(
+    @Param('idTask', ParseIntPipe) idTask: number,
     @Param('emailUser') emailUser: string,
-    @Body() dto: GradeTaskDto,
+    @Body() dto: QualifyUserTaskDto,
   ) {
-    // TODO: verificar que el usuario autenticado sea el docente de la tarea.
-    return this.userTasksService.grade(taskId, emailUser, dto);
+    // TODO: verificar que la sesión corresponda al docente de la tarea.
+    return this.userTasksService.qualify(idTask, emailUser, dto);
   }
 
-  @Get('users/:emailUser/history')
-  findHistory(@Param('emailUser') emailUser: string) {
-    return this.userTasksService.findHistory(emailUser);
-  }
-
-  @Get('tasks/:taskId')
-  findByTask(@Param('taskId', ParseIntPipe) taskId: number) {
-    return this.userTasksService.findByTask(taskId);
-  }
-
-  @Get(':taskId/users/:emailUser')
-  findOne(
-    @Param('taskId', ParseIntPipe) taskId: number,
-    @Param('emailUser') emailUser: string,
-  ) {
-    return this.userTasksService.findOne(taskId, emailUser);
+  @Get()
+  findAll(@Query() query: ListUserTasksDto) {
+    return this.userTasksService.findAll(query);
   }
 }
