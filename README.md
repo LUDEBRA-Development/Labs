@@ -1,159 +1,321 @@
-# Turborepo starter
+# LUDEBRA Labs
 
-This Turborepo starter is maintained by the Turborepo core team.
+**Laboratorio virtual para la enseñanza de circuitos electrónicos y electromagnetismo**, desarrollado para la Universidad Popular del Cesar. La plataforma combina simuladores interactivos, gestión académica (docentes, cursos, estudiantes) y seguimiento de actividades evaluativas en un solo aplicativo web.
 
-## Using this example
+> Repositorio: [github.com/LUDEBRA-Development/Labs](https://github.com/LUDEBRA-Development/Labs)
 
-Run the following command:
+Este repositorio es una **reconstrucción desde cero** del proyecto original de LUDEBRA Labs (ver carpeta/tag histórico del proyecto antiguo), migrado a una arquitectura de **monorepo** con **Turborepo** y **pnpm**, bajo el flujo de trabajo **Gitflow**.
 
-```sh
-npx create-turbo@latest
+---
+
+## Tabla de contenido
+
+- [LUDEBRA Labs](#ludebra-labs)
+  - [Tabla de contenido](#tabla-de-contenido)
+  - [Visión general](#visión-general)
+  - [Arquitectura del monorepo](#arquitectura-del-monorepo)
+  - [Stack tecnológico](#stack-tecnológico)
+  - [Módulos del sistema](#módulos-del-sistema)
+    - [Módulo 1 — Gestión de Personas y Acceso](#módulo-1--gestión-de-personas-y-acceso)
+    - [Módulo 2 — Cursos y Matrícula](#módulo-2--cursos-y-matrícula)
+    - [Módulo 3 — Contenido y Actividades](#módulo-3--contenido-y-actividades)
+    - [Módulo 4 — Evaluación y Seguimiento](#módulo-4--evaluación-y-seguimiento)
+  - [Estructura de carpetas](#estructura-de-carpetas)
+  - [Requisitos previos](#requisitos-previos)
+  - [Puesta en marcha](#puesta-en-marcha)
+    - [1. Clonar el repositorio](#1-clonar-el-repositorio)
+    - [2. Instalar pnpm (si no lo tienes)](#2-instalar-pnpm-si-no-lo-tienes)
+    - [3. Instalar dependencias](#3-instalar-dependencias)
+    - [4. Variables de entorno](#4-variables-de-entorno)
+    - [5. Levantar el proyecto en desarrollo](#5-levantar-el-proyecto-en-desarrollo)
+    - [6. Compilar para producción](#6-compilar-para-producción)
+    - [Instalar una dependencia dentro de una app o paquete](#instalar-una-dependencia-dentro-de-una-app-o-paquete)
+  - [Scripts disponibles](#scripts-disponibles)
+  - [Flujo de trabajo con Gitflow](#flujo-de-trabajo-con-gitflow)
+  - [Convenciones de commits](#convenciones-de-commits)
+  - [Reglas de contribución](#reglas-de-contribución)
+  - [Roadmap](#roadmap)
+  - [Documentación adicional](#documentación-adicional)
+  - [Equipo](#equipo)
+  - [Licencia](#licencia)
+
+---
+
+## Visión general
+
+LUDEBRA Labs nace para resolver un problema puntual en la enseñanza de electromagnetismo y circuitos electrónicos: los estudiantes tienen dificultades para visualizar y aplicar de forma práctica conceptos teóricos por falta de herramientas interactivas. La plataforma ofrece:
+
+- Un **catálogo de simuladores** electromagnéticos que cualquier usuario puede consultar.
+- Un **flujo académico completo**: un administrador registra docentes, los docentes crean cursos y matriculan estudiantes, diseñan guías y actividades apoyadas en simuladores, y finalmente califican las entregas de sus estudiantes.
+- Soporte para distintos tipos de usuario: **Administrador**, **Docente**, **Estudiante** y **Usuario externo** (este último solo con acceso al catálogo de simuladores).
+
+El proyecto está pensado para **crecer**: nuevos simuladores, nuevos módulos académicos y nuevas integraciones deben poder añadirse sin reescribir lo existente. Por eso la reconstrucción se hace como monorepo modular en lugar de la aplicación monolítica original.
+
+## Arquitectura del monorepo
+
+```
+Labs/
+├── apps/
+│   ├── backend/      # API REST — NestJS
+│   └── frontend/     # SPA — React + Vite
+├── packages/
+│   ├── ui/                 # Librería de componentes compartidos
+│   ├── eslint-config/      # Configuración de ESLint compartida
+│   └── typescript-config/  # tsconfig base compartido
+├── turbo.json
+├── pnpm-workspace.yaml
+└── package.json
 ```
 
-## What's inside?
+- **Turborepo** orquesta las tareas (`build`, `dev`, `lint`, `check-types`) entre todos los paquetes, cacheando resultados para acelerar CI y desarrollo local.
+- **pnpm workspaces** administra las dependencias de `apps/*` y `packages/*` sin duplicarlas, y permite que el frontend y el backend compartan configuración (ESLint, TypeScript) desde `packages/`.
+- Cada módulo funcional (ver [Módulos del sistema](#módulos-del-sistema)) vive como un dominio dentro de `apps/backend` (módulos de NestJS) y como un conjunto de rutas/vistas dentro de `apps/frontend`, de modo que se puedan extraer a paquetes o incluso a servicios independientes en el futuro sin romper el resto del sistema.
 
-This Turborepo includes the following packages/apps:
+## Stack tecnológico
 
-### Apps and Packages
+| Capa | Tecnología |
+|---|---|
+| Monorepo / tooling | Turborepo, pnpm, ESLint, Prettier, TypeScript |
+| Backend | NestJS 11, Node.js |
+| Frontend | React 19, Vite, React Router, Tailwind CSS 4 |
+| Control de versiones | Git + Gitflow |
+| Base de datos / ORM | *Por definir — se documentará aquí cuando se incorpore* |
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+> Este proyecto reemplaza el stack original (React + JavaScript sin monorepo, sin backend propio documentado) por una arquitectura tipada y modular pensada para escalar en equipo.
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+## Módulos del sistema
 
-### Utilities
+El sistema se organiza en módulos funcionales independientes que, en conjunto, cubren todo el ciclo de vida académico dentro de la plataforma.
 
-This Turborepo has some additional tools already setup for you:
+### Módulo 1 — Gestión de Personas y Acceso
+Administra **quién existe en el sistema y cómo entra**, separando el perfil (nombre, correo, rol, datos de contacto) de las credenciales de acceso.
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+- Registro y administración de usuarios (Administrador, Docente, Estudiante, Usuario externo).
+- Autenticación y autorización basada en roles.
+- Gestión de perfil: actualización de datos personales y cambio de contraseña.
+- Validación de identidad y control del tipo de acceso según el rol.
 
-### Build
+### Módulo 2 — Cursos y Matrícula
+Cubre la relación entre docentes, cursos y estudiantes: **al docente se le asigna el curso y se ingresan los estudiantes**.
 
-To build all apps and packages, run the following command:
+- Creación y administración de cursos.
+- Asignación de un docente responsable a cada curso.
+- Matrícula (ingreso/gestión) de estudiantes dentro de un curso.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+### Módulo 3 — Contenido y Actividades
+El **docente crea guías y asigna actividades al curso**, incluyendo qué simulador habilita para cada una.
 
-```sh
-cd my-turborepo
-turbo build
+- Creación de guías de apoyo para las actividades.
+- Diseño y asignación de actividades a un curso.
+- Vinculación de cada actividad con el simulador del catálogo que debe usarse para resolverla.
+- Catálogo de simuladores electromagnéticos, disponible también para usuarios externos.
+
+### Módulo 4 — Evaluación y Seguimiento
+El **ciclo completo de entrega y calificación** de actividades (equivalente a `User_tasks` en el proyecto original).
+
+- Entrega de actividades por parte del estudiante (carga de documentos/resultados).
+- Temporizador de actividades definido por el docente.
+- Calificación de entregas por parte del docente.
+- Seguimiento del progreso del estudiante dentro de cada curso.
+
+> Estos cuatro módulos son el punto de partida. La arquitectura del monorepo está pensada para que módulos futuros (por ejemplo, reportería, notificaciones, nuevos simuladores o integraciones externas) se añadan como nuevos dominios dentro de `apps/backend` y nuevas rutas en `apps/frontend`, o incluso como paquetes/servicios independientes dentro de `apps/` o `packages/`.
+
+## Estructura de carpetas
+
+```
+apps/backend/
+└── src/
+    ├── main.ts
+    ├── app.module.ts
+    └── <módulo>/           # un módulo de NestJS por dominio (personas-acceso, cursos, contenido, evaluacion, ...)
+
+apps/frontend/
+└── src/
+    ├── assets/
+    └── <módulo>/           # vistas y componentes por dominio, con sus propias rutas
 ```
 
-Without global `turbo`, use your package manager:
+A medida que se implemente cada módulo, se documentará aquí su ubicación exacta y sus principales endpoints/rutas.
 
-```sh
-cd my-turborepo
-npx turbo build
-pnpm dlx turbo build
-pnpm exec turbo build
+## Requisitos previos
+
+- [Node.js](https://nodejs.org/) `>= 18`
+- [pnpm](https://pnpm.io/) `9.x` (gestor de paquetes del monorepo)
+- Git
+
+## Puesta en marcha
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/LUDEBRA-Development/Labs.git
+cd Labs
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+### 2. Instalar pnpm (si no lo tienes)
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+El monorepo usa pnpm como gestor de paquetes obligatorio (no usar `npm install` ni `yarn install`, ya que romperían el `pnpm-lock.yaml` y los workspaces).
 
-```sh
-turbo build --filter=docs
+```bash
+npm install -g pnpm@9
 ```
 
-Without global `turbo`:
+### 3. Instalar dependencias
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+Desde la **raíz** del repositorio, un solo comando instala las dependencias de `apps/*` y `packages/*` a la vez:
+
+```bash
+pnpm install
 ```
 
-### Develop
+### 4. Variables de entorno
 
-To develop all apps and packages, run the following command:
+Cada app que las necesite tendrá su propio archivo de ejemplo (`.env.example`) dentro de `apps/backend` y/o `apps/frontend`. Cópialo y complétalo antes de levantar el proyecto:
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
+```bash
+cp apps/backend/.env.example apps/backend/.env
 ```
 
-Without global `turbo`, use your package manager:
+> Se actualizará esta sección con las variables reales a medida que se agreguen (conexión a base de datos, puertos, claves, etc.).
 
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
+### 5. Levantar el proyecto en desarrollo
+
+Para levantar **todo** el monorepo (backend + frontend en paralelo, orquestado por Turborepo):
+
+```bash
+pnpm dev
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Para trabajar solo con una app puntual, usa los filtros de Turborepo:
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
+```bash
+pnpm turbo dev --filter=backend
+pnpm turbo dev --filter=frontend
 ```
 
-Without global `turbo`:
+### 6. Compilar para producción
 
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+```bash
+pnpm build
 ```
 
-### Remote Caching
+### Instalar una dependencia dentro de una app o paquete
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+Como es un workspace, **no** ejecutes `pnpm install` dentro de `apps/backend` o `apps/frontend`. Usa el flag `--filter` desde la raíz:
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
+```bash
+pnpm add <paquete> --filter backend
+pnpm add <paquete> --filter frontend
+pnpm add -D <paquete> --filter backend   # dependencia de desarrollo
 ```
 
-Without global `turbo`, use your package manager:
+Si la dependencia es compartida por todo el monorepo (herramientas de tooling, por ejemplo), instálala en la raíz:
 
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
+```bash
+pnpm add -D <paquete> -w
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## Scripts disponibles
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+Definidos en el `package.json` raíz y ejecutados por Turborepo sobre todos los paquetes:
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+| Script | Descripción |
+|---|---|
+| `pnpm dev` | Levanta backend y frontend en modo desarrollo |
+| `pnpm build` | Compila todas las apps y paquetes |
+| `pnpm lint` | Ejecuta ESLint en todo el monorepo |
+| `pnpm check-types` | Verifica los tipos de TypeScript en todo el monorepo |
+| `pnpm format` | Formatea el código con Prettier |
 
-```sh
-turbo link
+## Flujo de trabajo con Gitflow
+
+El repositorio sigue **Gitflow** para ordenar el desarrollo entre módulos y liberar versiones de forma controlada.
+
+- **`main`** — código en producción / estable.
+- **`develop`** — rama de integración; toda funcionalidad terminada llega aquí primero.
+- **`feat/<descripcion>`** — una rama por funcionalidad, creada desde `develop` y fusionada de vuelta a `develop` vía Pull Request. Ejemplos ya usados en el proyecto:
+  - `feat/configuracion-backend-nestjs`
+  - `feat/configuracion-frontend-react-vite`
+  - `feat/adicion-dependencias-router-tailwind-frontend`
+  - `feat/correccion-package-nest`
+- **`fix/<descripcion>`** — corrección de errores sobre `develop`.
+- **`release/<version>`** — estabilización previa a publicar una nueva versión en `main`.
+- **`hotfix/<descripcion>`** — corrección urgente directamente sobre `main`.
+
+Flujo recomendado para una nueva tarea:
+
+```bash
+git checkout develop
+git pull
+git checkout -b feat/nombre-de-la-tarea
+# ... trabajo y commits ...
+git push -u origin feat/nombre-de-la-tarea
+# Abrir Pull Request hacia develop
 ```
 
-Without global `turbo`:
+## Convenciones de commits
 
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
+Se recomienda seguir [Conventional Commits](https://www.conventionalcommits.org/) para mantener un historial legible y facilitar el versionado automático a futuro:
+
+```
+feat: agregar módulo de matrícula de estudiantes
+fix: corregir validación de credenciales en login
+chore: configurar eslint compartido en packages
+docs: actualizar README con módulo de evaluación
 ```
 
-## Useful Links
+## Reglas de contribución
 
-Learn more about the power of Turborepo:
+Cualquier persona del equipo puede contribuir al proyecto, siempre dentro del flujo de **Gitflow** descrito arriba. Estas son las reglas base:
 
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+1. **Nunca se hace push directo a `develop` ni a `main`.** Todo cambio entra a través de una rama (`feat/`, `fix/`, `release/`, `hotfix/`) y un Pull Request.
+2. **Toda funcionalidad o corrección nace desde `develop`** (salvo un `hotfix`, que nace desde `main`) y se nombra siguiendo la convención `tipo/descripcion-corta-en-minusculas`, por ejemplo `feat/matricula-estudiantes` o `fix/validacion-login`.
+3. **Abrir el Pull Request cuanto antes**, aunque esté en progreso (se puede marcar como *draft*), para que el resto del equipo tenga visibilidad de en qué se está trabajando y evitar choques entre ramas.
+4. **El Pull Request debe describir claramente qué hace el cambio**: qué módulo toca, qué problema resuelve o qué funcionalidad agrega, y cómo probarlo.
+5. **Solo el aprobador del repositorio (mantenedor del proyecto) revisa y aprueba/mergea los Pull Requests** hacia `develop` y `main`. El resto del equipo puede y debe:
+   - Abrir sus propios PRs.
+   - Revisar y comentar los PRs de sus compañeros (sugerencias, dudas, señalar errores).
+   - Pero **no mergear** por su cuenta, ni siquiera si el PR ya tiene aprobaciones de otros compañeros.
+6. **Antes de pedir revisión**, verifica localmente que el cambio pasa lint, tipado y build:
+   ```bash
+   pnpm lint
+   pnpm check-types
+   pnpm build
+   ```
+7. **Mantén tu rama actualizada con `develop`** antes de abrir o actualizar el PR, para reducir conflictos:
+   ```bash
+   git checkout feat/tu-rama
+   git fetch origin
+   git merge origin/develop
+   ```
+8. **Un PR, un propósito.** Evita mezclar en la misma rama cambios de módulos o temas distintos; eso facilita la revisión y el rollback si algo falla.
+9. Las liberaciones a `main` (ramas `release/*`) y los `hotfix/*` los coordina el mantenedor del proyecto.
+
+## Roadmap
+
+- [x] Configuración base del monorepo (Turborepo + pnpm)
+- [x] Scaffolding de backend (NestJS) y frontend (React + Vite + Tailwind)
+- [ ] Módulo 1 — Gestión de Personas y Acceso
+- [ ] Módulo 2 — Cursos y Matrícula
+- [ ] Módulo 3 — Contenido y Actividades (incluye catálogo de simuladores)
+- [ ] Módulo 4 — Evaluación y Seguimiento
+- [ ] Definición de base de datos / ORM
+- [ ] Migración de simuladores del proyecto original
+- [ ] CI/CD y despliegue
+
+## Documentación adicional
+
+- Documentación funcional original del proyecto (requerimientos, casos de uso, diagramas UML, mockups): ver documento de análisis y diseño de LUDEBRA Labs compartido por el equipo.
+- Cada app (`apps/backend`, `apps/frontend`) mantiene su propio `README.md` con detalles específicos de configuración y ejecución.
+
+## Equipo
+
+Proyecto desarrollado por el equipo de **LUDEBRA Development** para la Facultad de Ingeniería y Tecnologías de la Universidad Popular del Cesar y con la colaboracion de los siguientes programadores:
+@brisaac08
+@Luis301311
+@Moo0nchild
+@wilemanjr
+
+## Licencia
+
+*Por definir.*
