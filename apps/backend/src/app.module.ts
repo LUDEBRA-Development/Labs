@@ -1,10 +1,33 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { TasksModule } from './tasks/tasks.module';
+import { ConfigModuleSetup, DatabaseConfig } from './config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { StatesModule } from './states/states.module';
 
+// app.module.ts
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModuleSetup,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const db = configService.getOrThrow<DatabaseConfig>('database');
+        return {
+          type: 'mysql',
+          host: db.host,
+          port: db.port,
+          username: db.user,
+          password: db.password,
+          database: db.database,
+          autoLoadEntities: true,
+          synchronize: false,
+        };
+      },
+    }),
+    TasksModule,
+    StatesModule,
+  ],
 })
 export class AppModule {}
