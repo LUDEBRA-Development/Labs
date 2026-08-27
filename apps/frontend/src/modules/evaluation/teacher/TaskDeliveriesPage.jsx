@@ -91,7 +91,7 @@ export function TaskDeliveriesPage() {
       {status === "success" && (
         <>
           <section className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div>
+            <div className="min-w-0">
               <Link
                 className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-[#00668a]"
                 to="/evaluacion/docente/actividades"

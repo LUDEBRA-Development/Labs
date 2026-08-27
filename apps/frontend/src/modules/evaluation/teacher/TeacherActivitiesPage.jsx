@@ -127,7 +127,7 @@ export function TeacherActivitiesPage() {
 
           <section>
             <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div>
+              <div className="min-w-0">
                 <p className="technical-label text-[#00668a]">
                   {MOCK_COURSE.code}
                 </p>

@@ -70,7 +70,7 @@ export function StudentEvaluationPage() {
       <Breadcrumbs current="Vista del estudiante" />
 
       <section className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div>
+        <div className="min-w-0">
           <p className="technical-label text-[#00668a]">Panel académico</p>
           <h1 className="evaluation-font-display mt-2 text-[28px] font-semibold leading-9 tracking-tight text-[#181c1e] sm:text-4xl sm:leading-[44px]">
             Mis entregas y calificaciones
@@ -197,7 +197,7 @@ export function StudentEvaluationPage() {
 
         <section className="academic-card overflow-hidden xl:col-span-7">
           <div className="flex flex-col gap-4 border-b border-[#e0e3e5] px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+            <div className="min-w-0">
               <p className="technical-label text-[#00668a]">Seguimiento</p>
               <h2 className="evaluation-font-display mt-2 text-2xl font-semibold text-[#181c1e]">
                 Historial académico

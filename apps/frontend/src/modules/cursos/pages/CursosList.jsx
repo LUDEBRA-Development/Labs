@@ -54,7 +54,7 @@ export default function CursosList() {
   return (
     <div className="max-w-[1440px] mx-auto px-4 md:px-10 py-8 md:py-12">
       <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
+        <div className="min-w-0">
           <h2 className="font-headline-lg text-headline-lg text-primary">Cursos</h2>
           <p className="font-body-md text-body-md text-on-surface-variant mt-1">
             Gestión de cursos de laboratorio virtual
