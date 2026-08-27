@@ -3,6 +3,22 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { ROLE_HOME } from '../../routes/roleHome'
 
+// Único correo autorizado fuera del dominio institucional.
+const ADMIN_EMAIL = 'admin@ludebra.test'
+const INSTITUTIONAL_DOMAIN = '@unicesar.edu.co'
+
+// Mínimo 8 caracteres, al menos una mayúscula, una minúscula y un número.
+const PASSWORD_POLICY = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
+
+function isAllowedEmail(email) {
+  const normalized = email.trim().toLowerCase()
+  return normalized === ADMIN_EMAIL || normalized.endsWith(INSTITUTIONAL_DOMAIN)
+}
+
+function isAdminEmail(email) {
+  return email.trim().toLowerCase() === ADMIN_EMAIL
+}
+
 export function Login() {
   const { login, isAuthenticated, role, error: authError } = useAuth()
   const navigate = useNavigate()
@@ -29,6 +45,18 @@ export function Login() {
 
     if (!email || !password) {
       setFormError('Todos los campos son obligatorios.')
+      return
+    }
+
+    if (!isAllowedEmail(email)) {
+      setFormError('Solo se permiten correos institucionales (@unicesar.edu.co).')
+      return
+    }
+
+    if (!isAdminEmail(email) && !PASSWORD_POLICY.test(password)) {
+      setFormError(
+        'La contraseña debe tener mínimo 8 caracteres, incluyendo una mayúscula, una minúscula y un número.'
+      )
       return
     }
 
@@ -66,12 +94,15 @@ export function Login() {
             <input
               type="email"
               autoComplete="email"
-              placeholder="usuario@universidad.edu"
+              placeholder="usuario@unicesar.edu.co"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
               style={{ width: '100%' }}
             />
+            <p className="mt-1 text-xs text-slate-400">
+              Solo correos institucionales @unicesar.edu.co
+            </p>
           </div>
 
           <div>
@@ -97,6 +128,9 @@ export function Login() {
                 {showPassword ? '🙈' : '👁️'}
               </button>
             </div>
+            <p className="mt-1 text-xs text-slate-400">
+              Mínimo 8 caracteres, con una mayúscula, una minúscula y un número.
+            </p>
           </div>
 
           {(formError || authError) && (

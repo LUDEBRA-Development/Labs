@@ -8,8 +8,11 @@ import { ROLE_HOME } from './routes/roleHome'
 import { AdminLayout } from './components/layout/AdminLayout'
 import { AppLayout } from './components/layout/AppLayout'
 import { Login } from './pages/auth/Login'
+import { Landing } from './pages/Landing'
 import { AdminDashboard } from './pages/admin/AdminDashboard'
 import { UsersManagement } from './pages/admin/UsersManagement'
+import { SimuladoresPage } from './pages/admin/SimuladoresPage'
+import { SimuladoresCatalogPage } from './pages/campus/SimuladoresCatalogPage'
 import { TeacherDashboard } from './pages/teacher/TeacherDashboard'
 import { StudentSubjects } from './pages/student/StudentSubjects'
 import { NotFound } from './pages/NotFound'
@@ -28,7 +31,8 @@ function App() {
       {/* ============================================================
           REDIRECCIÓN INICIAL (según rol)
       ============================================================ */}
-      <Route path='/' element={<RootRedirect />} />
+      {/* <Route path='/' element={<RootRedirect />} /> */}
+      <Route path='/' element={<Landing />} />
 
       {/* ============================================================
           RUTAS AUTENTICADAS — No-Admin (AppLayout sin sidebar)
@@ -53,13 +57,16 @@ function App() {
             <Route path='/evaluacion' element={<StudentEvaluationPage />} />
           </Route>
 
-        </Route>
-      </Route>
+          {/* --- Evaluación: Docente --- */}
+          <Route element={<RoleRoute allow={['teacher']} />}>
+            <Route path='/evaluacion/docente/*' element={<TeacherEvaluationPage />} />
+          </Route>
 
-      {/* --- Evaluación: Docente (layout académico propio) --- */}
-      <Route element={<ProtectedRoute />}>
-        <Route element={<RoleRoute allow={['teacher']} />}>
-          <Route path='/evaluacion/docente/*' element={<TeacherEvaluationPage />} />
+          {/* --- Simuladores: Estudiante y Docente --- */}
+          <Route element={<RoleRoute allow={['student', 'teacher']} />}>
+            <Route path='/campus/simuladores' element={<SimuladoresCatalogPage />} />
+          </Route>
+
         </Route>
       </Route>
 
@@ -85,6 +92,9 @@ function App() {
 
             {/* Actividades */}
             <Route path='/admin/cursos/:cursoId/actividades/nueva' element={<CrearActividadPage />} />
+
+            {/* Simuladores */}
+            <Route path='/admin/simuladores' element={<SimuladoresPage />} />
           </Route>
         </Route>
       </Route>      {/* ============================================================
@@ -99,8 +109,9 @@ function RootRedirect() {
   const { isAuthenticated, role, loading } = useAuth()
 
   if (loading) return <FullScreenSpinner />
-  if (!isAuthenticated) return <Navigate to='/login' replace />
+  if (!isAuthenticated) return <Landing />
   return <Navigate to={ROLE_HOME[role] ?? '/login'} replace />
 }
 
 export default App
+
