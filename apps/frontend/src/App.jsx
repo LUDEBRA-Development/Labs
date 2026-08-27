@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { CursosList, CourseFormPage } from './cursos'
+import { CursosList, CourseFormPage } from './modules/cursos'
 import Sidebar from './components/layout/Sidebar'
-import { CrearActividadPage } from './actividades'
+import { CrearActividadPage } from './modules/actividades'
 import { useAuth } from './hooks/useAuth'
 import { ProtectedRoute, FullScreenSpinner } from './routes/ProtectedRoute'
 import { RoleRoute } from './routes/RoleRoute'
@@ -13,7 +13,9 @@ import { UsersManagement } from './pages/admin/UsersManagement'
 import { TeacherDashboard } from './pages/teacher/TeacherDashboard'
 import { StudentSubjects } from './pages/student/StudentSubjects'
 import { NotFound } from './pages/NotFound'
-import StudentTaskDetailPage from './actividades/pages/StudentTaskDetailPage'
+import StudentTaskDetailPage from './modules/actividades/pages/StudentTaskDetailPage'
+import { StudentEvaluationPage } from './modules/evaluation/StudentEvaluationPage'
+import { TeacherEvaluationPage } from './modules/evaluation/TeacherEvaluationPage'
 
 function AdminLayout({ children }) {
   return (
@@ -29,11 +31,22 @@ function AdminLayout({ children }) {
 function App() {
   return (
     <Routes>
+      {/* ============================================================
+          RUTAS PÚBLICAS
+      ============================================================ */}
       <Route path='/login' element={<Login />} />
+
+      {/* ============================================================
+          REDIRECCIÓN INICIAL (según rol)
+      ============================================================ */}
       <Route path='/' element={<RootRedirect />} />
 
+      {/* ============================================================
+          RUTAS AUTENTICADAS — AppLayout común
+      ============================================================ */}
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
+
           {/* --- Administrador --- */}
           <Route element={<RoleRoute allow={['admin']} />}>
             <Route path='/admin' element={<AdminDashboard />} />
@@ -45,16 +58,27 @@ function App() {
             <Route path='/docente' element={<TeacherDashboard />} />
           </Route>
 
-          {/* --- Estudiante (solo lectura) --- */}
+          {/* --- Estudiante --- */}
           <Route element={<RoleRoute allow={['student']} />}>
             <Route path='/materias' element={<StudentSubjects />} />
           </Route>
+
+          {/* --- Evaluación: Estudiante --- */}
+          <Route element={<RoleRoute allow={['student']} />}>
+            <Route path='/evaluacion' element={<StudentEvaluationPage />} />
+          </Route>
+
+          {/* --- Evaluación: Docente --- */}
+          <Route element={<RoleRoute allow={['teacher']} />}>
+            <Route path='/evaluacion/docente/*' element={<TeacherEvaluationPage />} />
+          </Route>
+
         </Route>
       </Route>
 
-      <Route path='*' element={<NotFound />} />
-      <Route path='/' element={<Navigate to='/login' replace />} />
-
+      {/* ============================================================
+          ADMIN — Cursos y Actividades (AdminLayout con Sidebar)
+      ============================================================ */}
       <Route
         path='/admin/cursos'
         element={
@@ -79,8 +103,6 @@ function App() {
           </AdminLayout>
         }
       />
-
-      {/* RUTAS PARA ACTIVIDADES (vista docente/admin) */}
       <Route
         path='/admin/cursos/:cursoId/actividades/nueva'
         element={
@@ -89,7 +111,10 @@ function App() {
           </AdminLayout>
         }
       />
-      {/* RUTAS PARA ACTIVIDADES (vista estudiante) */}
+
+      {/* ============================================================
+          ESTUDIANTE — Detalle de actividad
+      ============================================================ */}
       <Route
         path='/estudiante/cursos/:cursoId/actividades/:idTask'
         element={
@@ -98,12 +123,14 @@ function App() {
           </AdminLayout>
         }
       />
-      
+
+      {/* ============================================================
+          CATCH-ALL
+      ============================================================ */}
       <Route path='*' element={<Navigate to='/admin/cursos' replace />} />
     </Routes>
   )
 }
-
 
 function RootRedirect() {
   const { isAuthenticated, role, loading } = useAuth()
