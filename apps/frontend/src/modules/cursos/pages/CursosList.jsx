@@ -109,6 +109,7 @@ export default function CursosList() {
                   <th className="py-4 px-4 sm:px-6 text-left font-label-md text-label-md font-medium hidden md:table-cell">
                     Descripción
                   </th>
+                  <th className="py-4 px-4 sm:px-6 text-left font-label-md text-label-md font-medium hidden lg:table-cell">Docente</th>
                   <th className="py-4 px-4 sm:px-6 text-right font-label-md text-label-md font-medium">Acciones</th>
                 </tr>
               </thead>
@@ -132,8 +133,28 @@ export default function CursosList() {
                     <td className="py-4 px-4 sm:px-6 font-body-md text-body-md text-on-surface-variant hidden md:table-cell max-w-xs truncate">
                       {course.description || '—'}
                     </td>
+                    <td className="py-4 px-4 sm:px-6 hidden lg:table-cell">
+                      {course.teacher ? <span className="inline-flex items-center gap-1 rounded-full bg-state-success-container px-2 py-1 text-xs font-medium text-state-success"><span className="material-symbols-outlined text-[16px]">check_circle</span>Docente asignado</span> : <span className="text-sm text-on-surface-variant">Sin docente</span>}
+                    </td>
                     <td className="py-4 px-4 sm:px-6">
                       <div className="flex items-center justify-end gap-1 sm:gap-2">
+                        <button onClick={() => navigate(`/admin/cursos/${course.idCourse}`)} className="px-2 py-1.5 sm:px-3 rounded-lg font-label-md text-label-md text-primary hover:bg-surface-container-low border border-outline-variant/50 transition-colors flex items-center gap-1" title="Ver detalles"><span className="material-symbols-outlined text-[16px]">visibility</span><span className="hidden xl:inline">Detalles</span></button>
+                        <button
+                          onClick={() => navigate(`/admin/cursos/${course.idCourse}/docente`)}
+                          className="px-2 py-1.5 sm:px-3 rounded-lg font-label-md text-label-md text-primary hover:bg-surface-container-low border border-outline-variant/50 transition-colors flex items-center gap-1"
+                          title={course.teacher ? 'Cambiar docente' : 'Asignar docente'}
+                        >
+                          <span className="material-symbols-outlined text-[16px]">person_add</span>
+                          <span className="hidden lg:inline">Docente</span>
+                        </button>
+                        <button
+                          onClick={() => navigate(`/admin/cursos/${course.idCourse}/matricula`)}
+                          className="px-2 py-1.5 sm:px-3 rounded-lg font-label-md text-label-md text-primary hover:bg-surface-container-low border border-outline-variant/50 transition-colors flex items-center gap-1"
+                          title="Matricular estudiantes"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">group</span>
+                          <span className="hidden lg:inline">Matrícula</span>
+                        </button>
                         <button
                           onClick={() => navigate(`/admin/cursos/${course.idCourse}/editar`)}
                           className="px-2 py-1.5 sm:px-3 rounded-lg font-label-md text-label-md text-primary hover:bg-surface-container-low border border-outline-variant/50 transition-colors flex items-center gap-1"

@@ -16,7 +16,10 @@ export const databaseConfig = {
 export const ConfigModuleSetup = ConfigModule.forRoot({
   isGlobal: true, 
   envFilePath: join(__dirname, '../.env'),
-  load: [() => ({ database: databaseConfig })],
+  load: [
+    () => ({ database: databaseConfig }),
+    () => ({ firebase: FirebaseConfig }),
+  ],
 });
 
 export const FirebaseConfig = {
