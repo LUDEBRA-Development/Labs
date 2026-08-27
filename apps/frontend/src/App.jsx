@@ -13,6 +13,7 @@ import { UsersManagement } from './pages/admin/UsersManagement'
 import { TeacherDashboard } from './pages/teacher/TeacherDashboard'
 import { StudentSubjects } from './pages/student/StudentSubjects'
 import { NotFound } from './pages/NotFound'
+import StudentTaskDetailPage from './actividades/pages/StudentTaskDetailPage'
 
 function AdminLayout({ children }) {
   return (
@@ -88,7 +89,16 @@ function App() {
           </AdminLayout>
         }
       />
-
+      {/* RUTAS PARA ACTIVIDADES (vista estudiante) */}
+      <Route
+        path='/estudiante/cursos/:cursoId/actividades/:idTask'
+        element={
+          <AdminLayout>
+            <StudentTaskDetailPage />
+          </AdminLayout>
+        }
+      />
+      
       <Route path='*' element={<Navigate to='/admin/cursos' replace />} />
     </Routes>
   )

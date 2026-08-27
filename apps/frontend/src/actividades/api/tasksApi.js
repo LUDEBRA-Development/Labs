@@ -17,6 +17,7 @@ export const tasksApi = {
   create: (dto) => request('/tasks', { method: 'POST', body: JSON.stringify(dto) }),
   findByPeriod: (periodId) => request(`/tasks?periodId=${periodId}`),
   findOne: (id) => request(`/tasks/${id}`),
+  getById: (id) => request(`/tasks/${id}`), 
   update: (id, dto) => request(`/tasks/${id}`, { method: 'PATCH', body: JSON.stringify(dto) }),
   assignSimulators: (id, simulatorIds) =>
     request(`/tasks/${id}/simulators`, { method: 'POST', body: JSON.stringify({ simulatorIds }) }),

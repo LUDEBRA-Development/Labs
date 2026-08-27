@@ -3,7 +3,7 @@ import { tasksApi } from '../api/tasksApi';
 import { taskFilesApi } from '../api/taskFilesApi';
 import SimulatorMultiSelect from '../components/SimulatorMultiSelect';
 
-export default function CrearActividadPage() {
+export default function DetalleActividadPage() {
   const [form, setForm] = useState({
     name: '',
     descriptions: '',
