@@ -7,12 +7,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SimulatorsModule } from '../simulators/simulators.module';
 import { State } from '../states/entities/state.entity';
 import { StatesModule } from '../states/states.module';
+import { Period } from '../courses/entities/period.entity';
+import { AuthModule } from '../auth/auth.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Task, Simulator, State]), 
+    TypeOrmModule.forFeature([Task, Simulator, State, Period]),
     SimulatorsModule,
-    StatesModule
+    StatesModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [TasksController],
   providers: [TasksService],

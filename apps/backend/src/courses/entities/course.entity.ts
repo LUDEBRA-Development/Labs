@@ -7,7 +7,6 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 import { State } from '../../states/entities/state.entity';
-import { User } from '../../users/entities/user.entity';
 import { Period } from './period.entity';
 
 @Entity('courses')
@@ -25,10 +24,8 @@ export class Course {
   @JoinColumn({ name: 'Id_state' })
   state!: State;
 
-  // Docente responsable del curso (nullable: un curso puede no tener uno aún).
-  @ManyToOne(() => User, { eager: false, nullable: true })
-  @JoinColumn({ name: 'Id_teacher' })
-  teacher?: User | null;
+  // Se resuelve desde Users_courses; el diseño original no tiene Id_teacher.
+  teacher?: import('../../users/entities/user.entity').User | null;
 
   @OneToMany(() => Period, (period) => period.course)
   periods?: Period[];

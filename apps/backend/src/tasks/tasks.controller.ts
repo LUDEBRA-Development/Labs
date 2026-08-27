@@ -1,5 +1,6 @@
 import {
   Body,
+  BadRequestException,
   Controller,
   Delete,
   Get,
@@ -8,6 +9,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   // Req, // descomenta cuando conectes el guard de auth para leer el usuario logueado
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
@@ -15,6 +17,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { AssignSimulatorsDto } from './dto/assign-simulators.dto';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { FirebaseAuthGuard } from 'src/auth/guards/firebase-auth.guard';
 import { User } from 'src/users/entities/user.entity';
 
 @Controller('tasks')
@@ -22,16 +25,24 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
+  @UseGuards(FirebaseAuthGuard)
   create(@Body() dto: CreateTaskDto, @CurrentUser() user: User) {
-    //const createdById = user.email;
-    const createdById = "docente@ejemplo.com";
+    const createdById = user.email;
     return this.tasksService.create(dto, createdById);
   }
 
   // GET /tasks?periodId=3
   @Get()
-  findByPeriod(@Query('periodId', ParseIntPipe) periodId: number) {
-    return this.tasksService.findByPeriod(periodId);
+  findByPeriod(
+    @Query('periodId') periodId?: string,
+    @Query('courseId') courseId?: string,
+  ) {
+    if (courseId) return this.tasksService.findByCourse(courseId);
+    const parsedPeriodId = Number(periodId);
+    if (!Number.isInteger(parsedPeriodId)) {
+      throw new BadRequestException('Debe proporcionar periodId o courseId');
+    }
+    return this.tasksService.findByPeriod(parsedPeriodId);
   }
 
   @Get(':id')

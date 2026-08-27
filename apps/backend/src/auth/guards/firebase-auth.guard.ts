@@ -11,7 +11,7 @@ import { UsersService } from '../../users/users.service';
 // Este guard hace dos cosas, en orden:
 // 1. Verifica el ID Token de Firebase (confirma que "quien entra" es quien
 //    dice ser, y que el token no expiró/fue falsificado).
-// 2. Busca en la BD propia el perfil ligado a ese firebaseUid y lo
+// 2. Busca en la BD propia el perfil ligado al UID del token y lo
 //    adjunta a `request.user`. Si el usuario no existe en la BD propia,
 //    o está desactivado, se rechaza aunque el token de Firebase sea válido.
 @Injectable()

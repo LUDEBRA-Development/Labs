@@ -6,6 +6,7 @@ import { Simulator } from '../simulators/entities/simulator.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { AssignSimulatorsDto } from './dto/assign-simulators.dto';
+import { Period } from '../courses/entities/period.entity';
 
 @Injectable()
 export class TasksService {
@@ -14,6 +15,8 @@ export class TasksService {
     private readonly taskRepository: Repository<Task>,
     @InjectRepository(Simulator)
     private readonly simulatorRepository: Repository<Simulator>,
+    @InjectRepository(Period)
+    private readonly periodRepository: Repository<Period>,
   ) {}
 
 async create(dto: CreateTaskDto, createdById: string): Promise<Task> {
@@ -38,6 +41,17 @@ async create(dto: CreateTaskDto, createdById: string): Promise<Task> {
      // where: { period: { idPeriod: periodId } as any }, mientran hacen el modulo periodo. 
      where: { periodId }, 
      order: { creationDate: 'DESC' },
+    });
+  }
+
+  async findByCourse(courseId: string): Promise<Task[]> {
+    const periods = await this.periodRepository.find({
+      where: { course: { idCourse: courseId } },
+    });
+    if (periods.length === 0) return [];
+    return this.taskRepository.find({
+      where: { periodId: In(periods.map(({ idPeriod }) => idPeriod)) },
+      order: { creationDate: 'DESC' },
     });
   }
 

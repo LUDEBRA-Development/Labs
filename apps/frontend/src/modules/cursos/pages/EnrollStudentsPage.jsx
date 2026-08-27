@@ -53,7 +53,7 @@ export default function EnrollStudentsPage() {
   }, [id])
 
   const enrolledIds = new Set(enrolled.map((e) => e.userId))
-  const available = students.filter((s) => !enrolledIds.has(s.idUser))
+  const available = students.filter((s) => !enrolledIds.has(s.email))
   const suggested = available.filter((s) => {
     const q = search.trim().toLowerCase()
     if (!q) return true
@@ -66,7 +66,7 @@ export default function EnrollStudentsPage() {
     setError(null)
     setSuccess(null)
     try {
-      await enrollStudent(id, user.idUser)
+      await enrollStudent(id, user.email)
       await loadEnrollments()
       setSuccess('Estudiante matriculado correctamente')
     } catch (err) {
@@ -172,7 +172,7 @@ export default function EnrollStudentsPage() {
                   .toUpperCase()
                 return (
                   <div
-                    key={s.idUser}
+                    key={s.email}
                     className="flex items-center justify-between p-2 hover:bg-surface-container-low rounded-md transition-colors group"
                   >
                     <div className="flex items-center gap-3 min-w-0">

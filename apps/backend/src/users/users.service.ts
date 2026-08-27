@@ -42,10 +42,10 @@ export class UsersService {
 
     try {
       const user = this.userRepository.create({
-        firebaseUid: firebaseUser.uid,
         email: dto.email,
         firstName: dto.firstName,
         lastName: dto.lastName,
+        profileId: firebaseUser.uid,
         role: dto.role,
         isActive: true,
       });
@@ -72,7 +72,7 @@ export class UsersService {
   }
 
   async findOne(id: string): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { idUser: id } });
+    const user = await this.userRepository.findOne({ where: { email: id } });
     if (!user) {
       throw new NotFoundException(`Usuario ${id} no encontrado`);
     }
@@ -81,7 +81,7 @@ export class UsersService {
 
   // Usado únicamente por FirebaseAuthGuard en cada request autenticado.
   findByFirebaseUid(firebaseUid: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { firebaseUid } });
+    return this.userRepository.findOne({ where: { profileId: firebaseUid } });
   }
 
   async update(id: string, dto: UpdateUserDto): Promise<User> {
@@ -96,7 +96,9 @@ export class UsersService {
   async updateStatus(id: string, dto: UpdateUserStatusDto): Promise<User> {
     const user = await this.findOne(id);
     user.isActive = dto.isActive;
-    await this.firebaseAdminService.setDisabled(user.firebaseUid, !dto.isActive);
+    if (user.profileId) {
+      await this.firebaseAdminService.setDisabled(user.profileId, !dto.isActive);
+    }
     return this.userRepository.save(user);
   }
 }

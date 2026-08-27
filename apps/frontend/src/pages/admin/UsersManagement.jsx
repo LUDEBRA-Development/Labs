@@ -55,7 +55,7 @@ export function UsersManagement() {
 
   async function toggleStatus(user) {
     try {
-      await usersService.updateStatus(user.idUser, !user.isActive)
+      await usersService.updateStatus(user.email, !user.isActive)
       loadUsers(roleFilter)
     } catch {
       setFeedback({ type: 'error', text: 'No se pudo actualizar el estado del usuario.' })
@@ -146,7 +146,7 @@ export function UsersManagement() {
             </thead>
             <tbody>
               {users.map((u) => (
-                <tr key={u.idUser} className="border-b border-slate-100">
+                <tr key={u.email} className="border-b border-slate-100">
                   <td className="py-2">
                     <p className="font-medium">{u.firstName} {u.lastName}</p>
                     <p className="text-xs text-slate-400 sm:hidden">{u.email}</p>

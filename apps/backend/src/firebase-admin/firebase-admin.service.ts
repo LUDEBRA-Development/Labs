@@ -62,10 +62,7 @@ export class FirebaseAdminService implements OnModuleInit {
     });
   }
 
-  setDisabled(
-    firebaseUid: string,
-    disabled: boolean,
-  ): Promise<UserRecord> {
+  setDisabled(firebaseUid: string, disabled: boolean): Promise<UserRecord> {
     return this.auth.updateUser(firebaseUid, { disabled });
   }
 

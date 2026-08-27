@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import { tasksApi } from '../api/tasksApi';
 import { taskFilesApi } from '../api/taskFilesApi';
@@ -28,10 +28,8 @@ function extensionOf(file) {
 
 export default function StudentTaskDetailPage() {
   const { idTask } = useParams();
-  const navigate = useNavigate();
   const { profile, firebaseUser } = useAuth();
-  const studentEmail = "estudiante@ejemplo.com";
-  //const studentEmail = profile?.email || firebaseUser?.email;
+  const studentEmail = profile?.email || firebaseUser?.email;
   const inputRef = useRef(null);
   const [task, setTask] = useState(null);
   const [files, setFiles] = useState([]);
@@ -126,7 +124,7 @@ export default function StudentTaskDetailPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-5 p-4 sm:p-6">
-      <button onClick={() => navigate(-1)} className="text-sm text-sky-700 hover:underline">← Volver a mis actividades</button>
+      <Link to="/materias" className="text-sm text-sky-700 hover:underline">← Volver a Mis materias</Link>
       {error && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">{error}</div>}
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
@@ -171,7 +169,7 @@ export default function StudentTaskDetailPage() {
                   {selectedFile && <div className="flex items-center gap-3 rounded-lg bg-slate-100 px-4 py-3 text-sm text-slate-700"><span>{fileIcon(extensionOf(selectedFile))}</span><span className="min-w-0 flex-1 truncate font-medium">{selectedFile.name}</span><button type="button" onClick={() => { setSelectedFile(null); inputRef.current.value = ''; }} className="text-red-600 hover:underline">Quitar</button></div>}
                   {fileError && <p className="text-sm text-red-600">{fileError}</p>}
                   <label className="block text-sm font-medium text-slate-700">Comentario para el docente <span className="font-normal text-slate-400">(opcional)</span><textarea value={comment} onChange={(event) => setComment(event.target.value)} maxLength={500} rows={3} className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 font-normal outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100" placeholder="Añade una nota sobre tu entrega..." /></label>
-                  <div className="flex justify-end gap-3 border-t border-slate-100 pt-4"><button type="button" onClick={() => navigate(-1)} className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">Cancelar</button><button type="submit" disabled={submitting} className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50">{submitting ? 'Entregando...' : 'Entregar actividad →'}</button></div>
+                  <div className="flex justify-end gap-3 border-t border-slate-100 pt-4"><Link to="/materias" className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">Cancelar</Link><button type="submit" disabled={submitting} className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50">{submitting ? 'Entregando...' : 'Entregar actividad →'}</button></div>
                 </form>}
           </section>
         </div>

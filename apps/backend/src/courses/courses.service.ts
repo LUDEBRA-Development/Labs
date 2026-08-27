@@ -45,21 +45,38 @@ export class CoursesService {
   }
 
   findAll(): Promise<Course[]> {
-    return this.courseRepository.find({
-      relations: { teacher: true },
-      order: { name: 'ASC' },
+    return this.courseRepository
+      .find({ order: { name: 'ASC' } })
+      .then((courses) => Promise.all(courses.map((course) => this.withTeacher(course))));
+  }
+
+  async listMyEnrollments(user: User): Promise<UserCourse[]> {
+    return this.userCourseRepository.find({
+      where: { userId: user.email },
+      relations: { course: true },
+      order: { enrollmentDate: 'ASC' },
     });
+  }
+
+  async listMyTeachingCourses(user: User): Promise<Course[]> {
+    const assignments = await this.userCourseRepository.find({
+      where: { userId: user.email },
+      relations: { course: true, user: true },
+      order: { enrollmentDate: 'ASC' },
+    });
+    return assignments
+      .filter(({ user: assignedUser }) => assignedUser?.role === Role.TEACHER)
+      .map(({ course }) => course);
   }
 
   async findOne(id: string): Promise<Course> {
     const course = await this.courseRepository.findOne({
       where: { idCourse: id },
-      relations: { teacher: true },
     });
     if (!course) {
       throw new NotFoundException(`Curso ${id} no encontrado`);
     }
-    return course;
+    return this.withTeacher(course);
   }
 
   async update(id: string, dto: UpdateCourseDto): Promise<Course> {
@@ -86,13 +103,23 @@ export class CoursesService {
   async assignTeacher(courseId: string, userId: string): Promise<Course> {
     await this.findOne(courseId);
     const user = await this.findActiveUser(userId, Role.TEACHER, 'docente');
-    await this.courseRepository.update(courseId, { teacher: user });
+    const currentTeachers = await this.findTeacherEnrollments(courseId);
+    await this.userCourseRepository.remove(
+      currentTeachers.filter((enrollment) => enrollment.userId !== user.email),
+    );
+    const existing = await this.userCourseRepository.findOne({
+      where: { courseId, userId: user.email },
+    });
+    if (!existing) {
+      await this.userCourseRepository.save(
+        this.userCourseRepository.create({ courseId, userId: user.email }),
+      );
+    }
     return this.findOne(courseId);
   }
 
   async removeTeacher(courseId: string): Promise<Course> {
-    await this.findOne(courseId);
-    await this.courseRepository.update(courseId, { teacher: null });
+    await this.userCourseRepository.remove(await this.findTeacherEnrollments(courseId));
     return this.findOne(courseId);
   }
 
@@ -101,10 +128,11 @@ export class CoursesService {
   // ---------------------------------------------------------------------
   async listStudents(courseId: string): Promise<UserCourse[]> {
     await this.findOne(courseId);
-    return this.userCourseRepository.find({
+    const enrollments = await this.userCourseRepository.find({
       where: { courseId },
       order: { enrollmentDate: 'ASC' },
     });
+    return enrollments.filter(({ user }) => user?.role === Role.STUDENT);
   }
 
   async enrollStudent(courseId: string, userId: string): Promise<UserCourse> {
@@ -216,7 +244,7 @@ export class CoursesService {
     label: string,
   ): Promise<User> {
     const user = await this.userRepository.findOne({
-      where: { idUser: userId },
+      where: { email: userId },
     });
     if (!user) {
       throw new NotFoundException(`Usuario ${userId} no encontrado`);
@@ -230,5 +258,23 @@ export class CoursesService {
       throw new BadRequestException(`El usuario ${userId} está deshabilitado`);
     }
     return user;
+  }
+
+  private async findTeacher(courseId: string): Promise<User | null> {
+    const enrollments = await this.findTeacherEnrollments(courseId);
+    return enrollments[0]?.user ?? null;
+  }
+
+  private async findTeacherEnrollments(courseId: string): Promise<UserCourse[]> {
+    const enrollments = await this.userCourseRepository.find({
+      where: { courseId },
+      relations: { user: true },
+    });
+    return enrollments.filter(({ user }) => user?.role === Role.TEACHER);
+  }
+
+  private async withTeacher(course: Course): Promise<Course> {
+    course.teacher = await this.findTeacher(course.idCourse);
+    return course;
   }
 }

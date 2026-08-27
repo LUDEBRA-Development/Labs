@@ -32,7 +32,7 @@ export default function AssignTeacherPage() {
         const activeTeachers = userList.filter((u) => u.isActive)
         setCourse(courseData)
         setTeachers(activeTeachers)
-        setSelectedId(courseData?.teacher?.idUser ?? '')
+        setSelectedId(courseData?.teacher?.email ?? '')
       } catch (err) {
         if (active) setError(err.message)
       } finally {
@@ -51,7 +51,7 @@ export default function AssignTeacherPage() {
     return (
       fullName.includes(q) ||
       (t.email || '').toLowerCase().includes(q) ||
-      (t.idUser || '').toLowerCase().includes(q)
+      (t.email || '').toLowerCase().includes(q)
     )
   })
 
@@ -167,10 +167,10 @@ export default function AssignTeacherPage() {
                     .slice(0, 2)
                     .join('')
                     .toUpperCase()
-                  const selected = selectedId === t.idUser
+                  const selected = selectedId === t.email
                   return (
                     <label
-                      key={t.idUser}
+                      key={t.email}
                       className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                         selected
                           ? 'border-secondary bg-surface-container-low shadow-sm'
@@ -182,7 +182,7 @@ export default function AssignTeacherPage() {
                         name="teacher"
                         className="accent-[#00AFEB] w-4 h-4"
                         checked={selected}
-                        onChange={() => setSelectedId(t.idUser)}
+                        onChange={() => setSelectedId(t.email)}
                       />
                       <div className="w-10 h-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-label-md font-bold shrink-0">
                         {initials || '—'}
@@ -193,7 +193,7 @@ export default function AssignTeacherPage() {
                         </p>
                         <p className="font-body-md text-[12px] text-on-surface-variant truncate">{t.email}</p>
                       </div>
-                      {course?.teacher?.idUser === t.idUser && (
+                      {course?.teacher?.email === t.email && (
                         <span className="text-xs font-medium bg-primary-container text-on-primary px-2 py-1 rounded-full shrink-0">
                           Asignado
                         </span>

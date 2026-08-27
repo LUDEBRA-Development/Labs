@@ -1,5 +1,6 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import Logo from './Logo'
+import { useAuth } from '../../hooks/useAuth'
 
 const navItems = [
   { to: '/admin', icon: 'dashboard', label: 'Dashboard' },
@@ -9,12 +10,19 @@ const navItems = [
 ]
 
 export default function Sidebar({ user = { name: 'Admin', role: 'System Controller' }, onNavigate }) {
+  const { logout } = useAuth()
+  const navigate = useNavigate()
   const initials = user.name
     .split(' ')
     .map((n) => n[0])
     .join('')
     .toUpperCase()
     .slice(0, 2)
+
+  async function handleLogout() {
+    await logout()
+    navigate('/login', { replace: true })
+  }
 
   return (
     <nav className="fixed left-0 top-0 h-full flex flex-col bg-primary shadow-xl z-50 w-[260px]">
@@ -57,7 +65,14 @@ export default function Sidebar({ user = { name: 'Admin', role: 'System Controll
         ))}
       </div>
 
-      <div className="p-4 border-t border-primary-container/30">
+      <div className="p-4 border-t border-primary-container/30 space-y-2">
+        <button
+          onClick={handleLogout}
+          className="w-full text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-container font-label-sm text-label-sm py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all"
+        >
+          <span className="material-symbols-outlined text-lg">logout</span>
+          Cerrar sesión
+        </button>
         <NavLink
           to="/admin/nuevo-usuario"
           className="w-full bg-secondary hover:bg-opacity-90 text-on-secondary font-label-sm text-label-sm py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all shadow-md"
