@@ -122,7 +122,7 @@ export function TaskDeliveriesPage() {
 
           <MockTasksNotice />
 
-          <section className="grid gap-4 sm:grid-cols-3">
+          <section className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <StatCard
               icon="users"
               label="Entregas recibidas"

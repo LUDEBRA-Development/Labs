@@ -52,7 +52,7 @@ export function Login() {
         <p className="text-slate-400">Virtual Laboratory Environment</p>
       </div>
 
-      <div className="w-full max-w-md rounded-2xl border-t-4 border-sky-400 bg-slate-50 p-8 shadow-2xl">
+      <div className="w-full max-w-md rounded-2xl border-t-4 border-sky-400 bg-slate-50 p-6 shadow-2xl sm:p-8">
         <h2 className="text-2xl font-semibold text-slate-900">Autenticación</h2>
         <p className="mt-2 text-sm text-slate-600">
           Ingrese sus credenciales institucionales para acceder al entorno simulado.

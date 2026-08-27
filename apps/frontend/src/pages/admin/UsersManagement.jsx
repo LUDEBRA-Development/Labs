@@ -69,7 +69,7 @@ export function UsersManagement() {
         <p className="text-slate-500">Registra docentes y estudiantes, y controla su acceso al sistema.</p>
       </div>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
         <h2 className="mb-4 text-lg font-semibold text-slate-800">Registrar usuario</h2>
         <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Nombre">
@@ -112,10 +112,10 @@ export function UsersManagement() {
         )}
       </section>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
+      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-slate-800">Usuarios registrados</h2>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {[
               { value: '', label: 'Todos' },
               { value: 'teacher', label: 'Docentes' },
@@ -138,7 +138,7 @@ export function UsersManagement() {
             <thead>
               <tr className="border-b border-slate-200 text-slate-500">
                 <th className="py-2">Nombre</th>
-                <th className="py-2">Correo</th>
+                <th className="py-2 hidden sm:table-cell">Correo</th>
                 <th className="py-2">Rol</th>
                 <th className="py-2">Estado</th>
                 <th className="py-2 text-right">Acción</th>
@@ -147,8 +147,11 @@ export function UsersManagement() {
             <tbody>
               {users.map((u) => (
                 <tr key={u.idUser} className="border-b border-slate-100">
-                  <td className="py-2">{u.firstName} {u.lastName}</td>
-                  <td className="py-2">{u.email}</td>
+                  <td className="py-2">
+                    <p className="font-medium">{u.firstName} {u.lastName}</p>
+                    <p className="text-xs text-slate-400 sm:hidden">{u.email}</p>
+                  </td>
+                  <td className="py-2 hidden sm:table-cell">{u.email}</td>
                   <td className="py-2 capitalize">{u.role}</td>
                   <td className="py-2">
                     <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${

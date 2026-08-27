@@ -205,7 +205,7 @@ export function EvaluateDeliveryPage() {
       )}
 
       <section className="academic-card overflow-hidden">
-        <div className="grid lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+        <div className="grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
           <div className="space-y-6 bg-[#f7fafc] p-6 sm:p-8">
             <div>
               <p className="technical-label text-[#00668a]">

@@ -18,26 +18,26 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen bg-slate-100">
-      <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-3 shadow-sm">
+      <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 shadow-sm sm:px-6">
         <span className="font-bold tracking-tight text-slate-800">LUDEBRA LABS</span>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           {profile && (
-            <span className="text-sm text-slate-600">
-              {profile.firstName} {profile.lastName}{' '}
-              <span className="ml-1 rounded-full bg-sky-100 px-2 py-0.5 text-xs font-semibold text-sky-700">
+            <span className="text-sm text-slate-600 truncate">
+              <span className="hidden sm:inline">{profile.firstName} {profile.lastName} </span>
+              <span className="rounded-full bg-sky-100 px-2 py-0.5 text-xs font-semibold text-sky-700">
                 {ROLE_LABEL[profile.role] ?? profile.role}
               </span>
             </span>
           )}
           <button
             onClick={handleLogout}
-            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+            className="shrink-0 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
           >
             Cerrar sesión
           </button>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-6 py-8">
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
         <Outlet />
       </main>
     </div>
