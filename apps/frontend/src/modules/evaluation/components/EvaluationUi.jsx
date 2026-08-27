@@ -105,6 +105,59 @@ export function EmptyState({ title, description }) {
   );
 }
 
+export function LoadingState({ label = "Cargando información…" }) {
+  return (
+    <div
+      aria-live="polite"
+      className="grid min-h-64 place-items-center px-6 py-12 text-center"
+    >
+      <div>
+        <span className="mx-auto block h-10 w-10 animate-spin rounded-full border-4 border-[#d9f3ff] border-t-[#00afeb]" />
+        <p className="mt-4 text-sm font-medium text-[#5b6265]">{label}</p>
+      </div>
+    </div>
+  );
+}
+
+export function ErrorState({ message, onRetry }) {
+  return (
+    <div className="grid min-h-64 place-items-center px-6 py-12 text-center">
+      <div className="max-w-[30rem]">
+        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#ffdad6] text-[#93000a]">
+          <Icon className="h-7 w-7" name="x" />
+        </span>
+        <h3 className="evaluation-font-display mt-4 text-xl font-semibold text-[#181c1e]">
+          No pudimos cargar la información
+        </h3>
+        <p className="mt-2 text-sm leading-6 text-[#5b6265]">{message}</p>
+        {onRetry && (
+          <button
+            className="secondary-button mt-5"
+            onClick={onRetry}
+            type="button"
+          >
+            <Icon name="refresh" />
+            Intentar nuevamente
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function MockTasksNotice() {
+  return (
+    <div className="flex items-start gap-3 rounded-xl border border-[#b9ddeb] bg-[#edf8fc] px-4 py-3 text-sm leading-6 text-[#004d6a]">
+      <Icon className="mt-0.5 h-5 w-5 shrink-0" name="flask" />
+      <p>
+        <strong>Actividades en modo de integración:</strong> los datos de las
+        tareas son simulados temporalmente; entregas y calificaciones provienen
+        del backend real de User_tasks.
+      </p>
+    </div>
+  );
+}
+
 export function Avatar({ email }) {
   const initials = email
     .split("@")[0]

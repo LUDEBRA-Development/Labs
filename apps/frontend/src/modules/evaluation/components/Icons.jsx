@@ -1,5 +1,6 @@
 const paths = {
   arrowLeft: <path d="m15 18-6-6 6-6" />,
+  arrowRight: <path d="m9 18 6-6-6-6" />,
   award: (
     <>
       <circle cx="12" cy="8" r="5" />
@@ -7,6 +8,12 @@ const paths = {
     </>
   ),
   check: <path d="m5 12 4 4L19 6" />,
+  calendar: (
+    <>
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <path d="M16 3v4M8 3v4M3 10h18" />
+    </>
+  ),
   clipboard: (
     <>
       <rect width="14" height="16" x="5" y="5" rx="2" />
@@ -25,6 +32,12 @@ const paths = {
       <path d="M7.5 16h9" />
     </>
   ),
+  fileText: (
+    <>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+      <path d="M14 2v6h6M8 13h8M8 17h6" />
+    </>
+  ),
   inbox: (
     <>
       <path d="M4 13 6.5 5h11L20 13v6H4Z" />
@@ -35,6 +48,12 @@ const paths = {
     <>
       <circle cx="11" cy="11" r="7" />
       <path d="m20 20-4-4" />
+    </>
+  ),
+  refresh: (
+    <>
+      <path d="M20 11a8 8 0 1 0-2.34 5.66" />
+      <path d="M20 4v7h-7" />
     </>
   ),
   user: (

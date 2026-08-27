@@ -67,11 +67,11 @@ function EvaluationLayout() {
       <main className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
         <Routes>
           <Route
-            element={<Navigate replace to="/evaluacion/estudiante" />}
+            element={<Navigate replace to="/evaluacion/docente/actividades" />}
             index
           />
           <Route element={<StudentEvaluationPage />} path="estudiante" />
-          <Route element={<TeacherEvaluationPage />} path="docente" />
+          <Route element={<TeacherEvaluationPage />} path="docente/*" />
         </Routes>
       </main>
     </div>
