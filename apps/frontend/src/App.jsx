@@ -11,6 +11,7 @@ import { Login } from './pages/auth/Login'
 import { Landing } from './pages/Landing'
 import { AdminDashboard } from './pages/admin/AdminDashboard'
 import { UsersManagement } from './pages/admin/UsersManagement'
+import { SimuladoresPage } from './pages/admin/SimuladoresPage'
 import { TeacherDashboard } from './pages/teacher/TeacherDashboard'
 import { StudentSubjects } from './pages/student/StudentSubjects'
 import { NotFound } from './pages/NotFound'
@@ -85,6 +86,9 @@ function App() {
 
             {/* Actividades */}
             <Route path='/admin/cursos/:cursoId/actividades/nueva' element={<CrearActividadPage />} />
+
+            {/* Simuladores */}
+            <Route path='/admin/simuladores' element={<SimuladoresPage />} />
           </Route>
         </Route>
       </Route>      {/* ============================================================
