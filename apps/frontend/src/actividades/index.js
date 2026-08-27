@@ -1,2 +1,2 @@
 export { default as CrearActividadPage } from './pages/CrearActividadPage';
-//export { default as DetalleActividadPage } from './pages/DetalleActividadPage';
+export { default as StudentTaskDetailPage } from './pages/StudentTaskDetailPage';
