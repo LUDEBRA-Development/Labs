@@ -1,4 +1,20 @@
 const API_BASE = 'http://localhost:3000'
+import { apiClient } from '../../../lib/apiClient'
+
+export async function getMyEnrollments() {
+  const res = await apiClient.get('/courses/mine/enrollments')
+  return res.data
+}
+
+export async function getMyTeachingCourses() {
+  const res = await apiClient.get('/courses/mine/teaching')
+  return res.data
+}
+
+export async function getTasksByCourse(courseId) {
+  const res = await apiClient.get('/tasks', { params: { courseId } })
+  return res.data
+}
 
 export async function getCourses() {
   const res = await fetch(`${API_BASE}/courses`)
@@ -72,6 +88,25 @@ export async function removeTeacher(courseId) {
 export async function listEnrollments(courseId) {
   const res = await fetch(`${API_BASE}/courses/${courseId}/enrollments`)
   if (!res.ok) throw new Error('Error al listar matrículas')
+  return res.json()
+}
+
+export async function listPeriods(courseId) {
+  const res = await fetch(`${API_BASE}/courses/${courseId}/periods`)
+  if (!res.ok) throw new Error('Error al listar períodos')
+  return res.json()
+}
+
+export async function createPeriod(courseId, data) {
+  const res = await fetch(`${API_BASE}/courses/${courseId}/periods`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => null)
+    throw new Error(body?.message?.[0] || body?.message || 'Error al crear el período')
+  }
   return res.json()
 }
 

@@ -39,11 +39,13 @@ function App() {
           {/* --- Docente --- */}
           <Route element={<RoleRoute allow={['teacher']} />}>
             <Route path='/docente' element={<TeacherDashboard />} />
+            <Route path='/docente/cursos/:cursoId/actividades/nueva' element={<CrearActividadPage />} />
           </Route>
 
           {/* --- Estudiante --- */}
           <Route element={<RoleRoute allow={['student']} />}>
             <Route path='/materias' element={<StudentSubjects />} />
+            <Route path='/estudiante/cursos/:cursoId/actividades/:idTask' element={<StudentTaskDetailPage />} />
           </Route>
 
           {/* --- Evaluación: Estudiante --- */}
@@ -84,17 +86,6 @@ function App() {
           </Route>
         </Route>
       </Route>      {/* ============================================================
-          ESTUDIANTE — Detalle de actividad (AdminLayout temporal)
-      ============================================================ */}
-      <Route element={<ProtectedRoute />}>
-        <Route element={<RoleRoute allow={['student']} />}>
-          <Route element={<AdminLayout />}>
-            <Route path='/estudiante/cursos/:cursoId/actividades/:idTask' element={<StudentTaskDetailPage />} />
-          </Route>
-        </Route>
-      </Route>
-
-      {/* ============================================================
           CATCH-ALL — 404
       ============================================================ */}
       <Route path='*' element={<Navigate to='/' replace />} />

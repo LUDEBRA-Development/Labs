@@ -1,8 +1,10 @@
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { auth } from '../../../lib/firebase';
 
 async function request(path, options = {}) {
+  const token = await auth.currentUser?.getIdToken();
   const response = await fetch(`${BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...options.headers },
     ...options,
   });
   if (!response.ok) {

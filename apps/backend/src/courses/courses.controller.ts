@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -15,6 +16,9 @@ import { AssignTeacherDto } from './dto/assign-teacher.dto';
 import { EnrollStudentDto } from './dto/enroll-student.dto';
 import { CreatePeriodDto } from './dto/create-period.dto';
 import { UpdatePeriodDto } from './dto/update-period.dto';
+import { FirebaseAuthGuard } from '../auth/guards/firebase-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { User } from '../users/entities/user.entity';
 
 @Controller('courses')
 export class CoursesController {
@@ -28,6 +32,18 @@ export class CoursesController {
   @Get()
   findAll() {
     return this.coursesService.findAll();
+  }
+
+  @Get('mine/enrollments')
+  @UseGuards(FirebaseAuthGuard)
+  listMyEnrollments(@CurrentUser() user: User) {
+    return this.coursesService.listMyEnrollments(user);
+  }
+
+  @Get('mine/teaching')
+  @UseGuards(FirebaseAuthGuard)
+  listMyTeachingCourses(@CurrentUser() user: User) {
+    return this.coursesService.listMyTeachingCourses(user);
   }
 
   // --- Docente responsable ---

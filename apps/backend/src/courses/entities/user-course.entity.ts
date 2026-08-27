@@ -9,18 +9,17 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { Course } from './course.entity';
 
-// Matrícula de un estudiante en un curso (relación N:N).
-// Clave compuesta natural (Id_user, Id_course), mismo patrón que User_tasks.
-@Entity('users_courses')
+// Matrícula de usuarios en cursos; el rol distingue docentes de estudiantes.
+@Entity('Users_courses')
 export class UserCourse {
-  @PrimaryColumn({ name: 'Id_user', type: 'char', length: 36 })
+  @PrimaryColumn({ name: 'Email_User', type: 'varchar', length: 100 })
   userId!: string;
 
   @PrimaryColumn({ name: 'Id_course', type: 'varchar', length: 8 })
   courseId!: string;
 
   @ManyToOne(() => User, { eager: true, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'Id_user', referencedColumnName: 'idUser' })
+  @JoinColumn({ name: 'Email_User', referencedColumnName: 'email' })
   user!: User;
 
   @ManyToOne(() => Course, { eager: false, onDelete: 'CASCADE' })
