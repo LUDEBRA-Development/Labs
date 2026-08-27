@@ -6,6 +6,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { StatesModule } from './states/states.module';
 import { CoursesModule } from './courses/courses.module';
 import { TaskFilesModule } from './tasks_files/tasks_files.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { FirebaseAdminModule } from './firebase-admin/firebase-admin.module';
 
 // app.module.ts
 @Module({
@@ -28,6 +31,9 @@ import { TaskFilesModule } from './tasks_files/tasks_files.module';
         };
       },
     }),
+    FirebaseAdminModule,
+    AuthModule,
+    UsersModule,
     TasksModule,
     StatesModule,
     CoursesModule,

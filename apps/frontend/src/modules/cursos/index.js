@@ -1,2 +1,5 @@
 export { default as CursosList } from './pages/CursosList'
 export { default as CourseFormPage } from './pages/CourseFormPage'
+export { default as AssignTeacherPage } from './pages/AssignTeacherPage'
+export { default as EnrollStudentsPage } from './pages/EnrollStudentsPage'
+export { default as CourseDetailPage } from './pages/CourseDetailPage'
