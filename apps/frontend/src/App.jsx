@@ -53,11 +53,13 @@ function App() {
             <Route path='/evaluacion' element={<StudentEvaluationPage />} />
           </Route>
 
-          {/* --- Evaluación: Docente --- */}
-          <Route element={<RoleRoute allow={['teacher']} />}>
-            <Route path='/evaluacion/docente/*' element={<TeacherEvaluationPage />} />
-          </Route>
+        </Route>
+      </Route>
 
+      {/* --- Evaluación: Docente (layout académico propio) --- */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<RoleRoute allow={['teacher']} />}>
+          <Route path='/evaluacion/docente/*' element={<TeacherEvaluationPage />} />
         </Route>
       </Route>
 

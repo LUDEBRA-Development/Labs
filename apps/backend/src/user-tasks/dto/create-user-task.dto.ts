@@ -5,6 +5,7 @@ import {
   IsString,
   MaxLength,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateUserTaskDto {
   // TODO: obtener este correo de la sesión cuando exista autenticación.
@@ -13,6 +14,7 @@ export class CreateUserTaskDto {
   emailUser!: string;
 
   @IsInt()
+  @Type(() => Number)
   idTask!: number;
 
   @IsOptional()

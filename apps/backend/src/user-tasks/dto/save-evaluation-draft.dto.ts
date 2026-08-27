@@ -2,24 +2,29 @@ import {
   ArrayUnique,
   IsArray,
   IsIn,
-  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   MaxLength,
   Min,
 } from 'class-validator';
-import { RUBRIC_CRITERION_IDS } from './save-evaluation-draft.dto';
 
-export class QualifyUserTaskDto {
+export const RUBRIC_CRITERION_IDS = [
+  'theoretical-calculations',
+  'si-units',
+  'charts-and-tables',
+] as const;
+
+export class SaveEvaluationDraftDto {
+  @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
-  qualification!: number;
+  qualification?: number;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MaxLength(500)
-  feedbackComments!: string;
+  feedbackComments?: string;
 
   @IsOptional()
   @IsArray()
