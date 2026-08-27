@@ -7,6 +7,9 @@ import { StatesModule } from './states/states.module';
 import { CoursesModule } from './courses/courses.module';
 import { TaskFilesModule } from './tasks_files/tasks_files.module';
 import { UserTasksModule } from './user-tasks/user-tasks.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { FirebaseAdminModule } from './firebase-admin/firebase-admin.module';
 
 // app.module.ts
 @Module({
@@ -29,6 +32,9 @@ import { UserTasksModule } from './user-tasks/user-tasks.module';
         };
       },
     }),
+    FirebaseAdminModule,
+    AuthModule,
+    UsersModule,
     TasksModule,
     StatesModule,
     CoursesModule,
