@@ -12,6 +12,7 @@ import { Landing } from './pages/Landing'
 import { AdminDashboard } from './pages/admin/AdminDashboard'
 import { UsersManagement } from './pages/admin/UsersManagement'
 import { SimuladoresPage } from './pages/admin/SimuladoresPage'
+import { SimuladoresCatalogPage } from './pages/campus/SimuladoresCatalogPage'
 import { TeacherDashboard } from './pages/teacher/TeacherDashboard'
 import { StudentSubjects } from './pages/student/StudentSubjects'
 import { NotFound } from './pages/NotFound'
@@ -59,6 +60,11 @@ function App() {
           {/* --- Evaluación: Docente --- */}
           <Route element={<RoleRoute allow={['teacher']} />}>
             <Route path='/evaluacion/docente/*' element={<TeacherEvaluationPage />} />
+          </Route>
+
+          {/* --- Simuladores: Estudiante y Docente --- */}
+          <Route element={<RoleRoute allow={['student', 'teacher']} />}>
+            <Route path='/campus/simuladores' element={<SimuladoresCatalogPage />} />
           </Route>
 
         </Route>

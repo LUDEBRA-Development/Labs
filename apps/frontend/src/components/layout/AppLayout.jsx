@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, NavLink } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 
 const ROLE_LABEL = {
@@ -21,6 +21,20 @@ export function AppLayout() {
       <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 shadow-sm sm:px-6">
         <span className="font-bold tracking-tight text-slate-800">LUDEBRA LABS</span>
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+          <nav className="flex items-center">
+            <NavLink
+              to="/campus/simuladores"
+              className={({ isActive }) =>
+                `shrink-0 rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                  isActive
+                    ? 'bg-sky-100 text-sky-700'
+                    : 'text-slate-600 hover:bg-slate-50'
+                }`
+              }
+            >
+              Simuladores
+            </NavLink>
+          </nav>
           {profile && (
             <span className="text-sm text-slate-600 truncate">
               <span className="hidden sm:inline">{profile.firstName} {profile.lastName} </span>
