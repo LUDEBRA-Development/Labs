@@ -14,16 +14,17 @@ import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { AssignSimulatorsDto } from './dto/assign-simulators.dto';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { User } from 'src/users/entities/user.entity';
 
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
-  create(@Body() dto: CreateTaskDto /*, @Req() req */) {
-    // TODO: reemplazar por el email del docente autenticado (req.user.email)
-    // una vez esté conectado el guard de auth (Firebase).
-    const createdById = 'docente@ejemplo.com';
+  create(@Body() dto: CreateTaskDto, @CurrentUser() user: User) {
+    //const createdById = user.email;
+    const createdById = "docente@ejemplo.com";
     return this.tasksService.create(dto, createdById);
   }
 

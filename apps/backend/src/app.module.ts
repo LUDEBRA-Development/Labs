@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { StatesModule } from './states/states.module';
 import { CoursesModule } from './courses/courses.module';
 import { TaskFilesModule } from './tasks_files/tasks_files.module';
+import { UserTasksModule } from './user-tasks/user-tasks.module';
 
 // app.module.ts
 @Module({
@@ -32,6 +33,7 @@ import { TaskFilesModule } from './tasks_files/tasks_files.module';
     StatesModule,
     CoursesModule,
     TaskFilesModule,
+    UserTasksModule,
   ],
 })
 export class AppModule {}

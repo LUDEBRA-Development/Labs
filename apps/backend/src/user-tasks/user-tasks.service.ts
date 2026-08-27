@@ -6,11 +6,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
+import { extname } from 'path';
+import { randomUUID } from 'crypto';
 import { Task } from '../tasks/entities/task.entity';
 import { CreateUserTaskDto } from './dto/create-user-task.dto';
 import { ListUserTasksDto } from './dto/list-user-tasks.dto';
 import { QualifyUserTaskDto } from './dto/qualify-user-task.dto';
 import { UserTask } from './entities/user-task.entity';
+import { DeliveryFile } from './entities/delivery-file.entity';
 
 @Injectable()
 export class UserTasksService {
@@ -19,6 +22,8 @@ export class UserTasksService {
     private readonly userTaskRepository: Repository<UserTask>,
     @InjectRepository(Task)
     private readonly taskRepository: Repository<Task>,
+    @InjectRepository(DeliveryFile)
+    private readonly deliveryFileRepository: Repository<DeliveryFile>,
   ) {}
 
   async create(
@@ -54,6 +59,34 @@ export class UserTasksService {
     });
 
     return this.userTaskRepository.save(delivery);
+  }
+
+  async submit(
+    dto: CreateUserTaskDto,
+    file: Express.Multer.File | undefined,
+  ): Promise<UserTask> {
+    if (!file) {
+      throw new BadRequestException('Debes adjuntar el informe de la tarea');
+    }
+
+    const allowedExtensions = new Set(['.pdf', '.doc', '.docx']);
+    const extension = extname(file.originalname).toLowerCase();
+    if (!allowedExtensions.has(extension)) {
+      throw new BadRequestException('Solo se permiten archivos PDF, DOC o DOCX');
+    }
+
+    const delivery = await this.create(dto);
+    await this.deliveryFileRepository.save(
+      this.deliveryFileRepository.create({
+        idFile: randomUUID(),
+        urlFile: `/uploads/deliveries/${file.filename}`,
+        emailUser: delivery.emailUser,
+        idTask: delivery.idTask,
+        fileName: file.originalname,
+        fileType: extension.slice(1),
+      }),
+    );
+    return delivery;
   }
 
   async qualify(
