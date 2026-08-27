@@ -53,8 +53,8 @@ export default function CursosList() {
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 md:px-10 py-8 md:py-12">
-      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
+      <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
           <h2 className="font-headline-lg text-headline-lg text-primary">Cursos</h2>
           <p className="font-body-md text-body-md text-on-surface-variant mt-1">
             Gestión de cursos de laboratorio virtual
@@ -103,13 +103,13 @@ export default function CursosList() {
             <table className="w-full">
               <thead>
                 <tr className="bg-primary-container text-on-primary">
-                  <th className="py-4 px-6 text-left font-label-md text-label-md font-medium">ID</th>
-                  <th className="py-4 px-6 text-left font-label-md text-label-md font-medium">Nombre</th>
-                  <th className="py-4 px-6 text-left font-label-md text-label-md font-medium">Código</th>
-                  <th className="py-4 px-6 text-left font-label-md text-label-md font-medium hidden md:table-cell">
+                  <th className="py-4 px-4 sm:px-6 text-left font-label-md text-label-md font-medium">ID</th>
+                  <th className="py-4 px-4 sm:px-6 text-left font-label-md text-label-md font-medium">Nombre</th>
+                  <th className="py-4 px-4 sm:px-6 text-left font-label-md text-label-md font-medium">Código</th>
+                  <th className="py-4 px-4 sm:px-6 text-left font-label-md text-label-md font-medium hidden md:table-cell">
                     Descripción
                   </th>
-                  <th className="py-4 px-6 text-right font-label-md text-label-md font-medium">Acciones</th>
+                  <th className="py-4 px-4 sm:px-6 text-right font-label-md text-label-md font-medium">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -120,34 +120,34 @@ export default function CursosList() {
                       i % 2 === 1 ? 'bg-[#f7fafc]' : ''
                     }`}
                   >
-                    <td className="py-4 px-6 font-label-md text-label-md text-primary font-medium">
+                    <td className="py-4 px-4 sm:px-6 font-label-md text-label-md text-primary font-medium">
                       {course.idCourse}
                     </td>
-                    <td className="py-4 px-6 font-body-md text-body-md text-on-surface font-medium">
+                    <td className="py-4 px-4 sm:px-6 font-body-md text-body-md text-on-surface font-medium">
                       {course.name}
                     </td>
-                    <td className="py-4 px-6 font-label-md text-label-md text-on-surface-variant">
+                    <td className="py-4 px-4 sm:px-6 font-label-md text-label-md text-on-surface-variant">
                       {course.code}
                     </td>
-                    <td className="py-4 px-6 font-body-md text-body-md text-on-surface-variant hidden md:table-cell max-w-xs truncate">
+                    <td className="py-4 px-4 sm:px-6 font-body-md text-body-md text-on-surface-variant hidden md:table-cell max-w-xs truncate">
                       {course.description || '—'}
                     </td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="py-4 px-4 sm:px-6">
+                      <div className="flex items-center justify-end gap-1 sm:gap-2">
                         <button
                           onClick={() => navigate(`/admin/cursos/${course.idCourse}/editar`)}
-                          className="px-3 py-1.5 rounded-lg font-label-md text-label-md text-primary hover:bg-surface-container-low border border-outline-variant/50 transition-colors flex items-center gap-1"
+                          className="px-2 py-1.5 sm:px-3 rounded-lg font-label-md text-label-md text-primary hover:bg-surface-container-low border border-outline-variant/50 transition-colors flex items-center gap-1"
                         >
                           <span className="material-symbols-outlined text-[16px]">edit</span>
-                          Editar
+                          <span className="hidden sm:inline">Editar</span>
                         </button>
                         <button
                           onClick={() => setConfirmDelete(course)}
                           disabled={deleting === course.idCourse}
-                          className="px-3 py-1.5 rounded-lg font-label-md text-label-md text-state-error hover:bg-state-error-container border border-state-error/20 transition-colors flex items-center gap-1 disabled:opacity-50"
+                          className="px-2 py-1.5 sm:px-3 rounded-lg font-label-md text-label-md text-state-error hover:bg-state-error-container border border-state-error/20 transition-colors flex items-center gap-1 disabled:opacity-50"
                         >
                           <span className="material-symbols-outlined text-[16px]">delete</span>
-                          {deleting === course.idCourse ? '...' : 'Eliminar'}
+                          <span className="hidden sm:inline">{deleting === course.idCourse ? '...' : 'Eliminar'}</span>
                         </button>
                       </div>
                     </td>

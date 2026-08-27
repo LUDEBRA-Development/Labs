@@ -110,7 +110,7 @@ export default function CourseForm() {
   return (
     <div className="max-w-[1440px] mx-auto px-4 md:px-10 py-8 md:py-12">
       <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <button
             onClick={() => navigate("/admin/cursos")}
             className="inline-flex items-center gap-2 text-primary font-label-md text-label-md mb-2 hover:text-secondary transition-colors"

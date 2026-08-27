@@ -23,7 +23,7 @@ export default function SimulatorMultiSelect({ selectedIds, onChange }) {
   if (loading) return <p className="text-sm text-gray-500">Cargando simuladores...</p>;
 
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {simulators.map((sim) => {
         const isSelected = selectedIds.includes(sim.idSimulador);
         return (

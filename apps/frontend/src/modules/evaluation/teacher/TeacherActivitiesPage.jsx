@@ -104,7 +104,7 @@ export function TeacherActivitiesPage() {
 
       {status === "success" && (
         <>
-          <section className="grid gap-4 sm:grid-cols-3">
+          <section className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <StatCard
               icon="fileText"
               label="Actividades"
@@ -127,7 +127,7 @@ export function TeacherActivitiesPage() {
 
           <section>
             <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div>
+              <div className="min-w-0">
                 <p className="technical-label text-[#00668a]">
                   {MOCK_COURSE.code}
                 </p>

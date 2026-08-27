@@ -43,7 +43,7 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-slate-900 px-4 py-12">
+    <div className="flex min-h-screen w-full flex-col items-center justify-center gap-6 bg-slate-900 px-4 py-12">
       <div className="flex flex-col items-center gap-3">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-500 shadow-lg shadow-sky-500/30">
           <FlaskIcon className="h-8 w-8 text-slate-900" />
@@ -52,7 +52,7 @@ export function Login() {
         <p className="text-slate-400">Virtual Laboratory Environment</p>
       </div>
 
-      <div className="w-full max-w-md rounded-2xl border-t-4 border-sky-400 bg-slate-50 p-8 shadow-2xl">
+      <div className="rounded-2xl border-t-4 border-sky-400 bg-slate-50 p-6 shadow-2xl sm:p-8" style={{ width: '100%', maxWidth: '28rem' }}>
         <h2 className="text-2xl font-semibold text-slate-900">Autenticación</h2>
         <p className="mt-2 text-sm text-slate-600">
           Ingrese sus credenciales institucionales para acceder al entorno simulado.
@@ -69,7 +69,8 @@ export function Login() {
               placeholder="usuario@universidad.edu"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
+              className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
+              style={{ width: '100%' }}
             />
           </div>
 
@@ -84,7 +85,8 @@ export function Login() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 pr-10 text-slate-900 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2.5 pr-10 text-slate-900 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
+                style={{ width: '100%' }}
               />
               <button
                 type="button"
@@ -107,6 +109,7 @@ export function Login() {
             type="submit"
             disabled={submitting}
             className="mt-2 rounded-lg bg-sky-700 py-3 font-semibold text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-60"
+            style={{ width: '100%' }}
           >
             {submitting ? 'Ingresando...' : 'Ingresar al Laboratorio'}
           </button>
