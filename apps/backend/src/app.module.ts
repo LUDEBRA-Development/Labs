@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { StatesModule } from './states/states.module';
 import { CoursesModule } from './courses/courses.module';
-import { UserTasksModule } from './user-tasks/user-tasks.module';
+import { TaskFilesModule } from './tasks_files/tasks_files.module';
 
 // app.module.ts
 @Module({
@@ -31,7 +31,7 @@ import { UserTasksModule } from './user-tasks/user-tasks.module';
     TasksModule,
     StatesModule,
     CoursesModule,
-    UserTasksModule,
+    TaskFilesModule,
   ],
 })
 export class AppModule {}
