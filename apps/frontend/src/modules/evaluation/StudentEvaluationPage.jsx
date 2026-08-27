@@ -72,10 +72,10 @@ export function StudentEvaluationPage() {
       <section className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="technical-label text-[#00668a]">Panel académico</p>
-          <h1 className="mt-2 font-display text-[28px] font-semibold leading-9 tracking-tight text-[#181c1e] sm:text-4xl sm:leading-[44px]">
+          <h1 className="evaluation-font-display mt-2 text-[28px] font-semibold leading-9 tracking-tight text-[#181c1e] sm:text-4xl sm:leading-[44px]">
             Mis entregas y calificaciones
           </h1>
-          <p className="mt-3 max-w-2xl text-base leading-6 text-[#5b6265]">
+          <p className="mt-3 max-w-[42rem] text-base leading-6 text-[#5b6265]">
             Registra una actividad dentro del plazo y consulta la
             retroalimentación del docente.
           </p>
@@ -126,7 +126,7 @@ export function StudentEvaluationPage() {
             <p className="font-mono text-xs uppercase tracking-[0.14em] text-[#86a0ac]">
               Nueva entrega
             </p>
-            <h2 className="mt-2 font-display text-2xl font-semibold">
+            <h2 className="evaluation-font-display mt-2 text-2xl font-semibold">
               Registrar actividad
             </h2>
             <p className="mt-2 text-sm leading-6 text-[#c4e7ff]">
@@ -199,7 +199,7 @@ export function StudentEvaluationPage() {
           <div className="flex flex-col gap-4 border-b border-[#e0e3e5] px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="technical-label text-[#00668a]">Seguimiento</p>
-              <h2 className="mt-2 font-display text-2xl font-semibold text-[#181c1e]">
+              <h2 className="evaluation-font-display mt-2 text-2xl font-semibold text-[#181c1e]">
                 Historial académico
               </h2>
             </div>
@@ -241,7 +241,7 @@ export function StudentEvaluationPage() {
                           ID: {delivery.idTask}
                         </p>
                         {delivery.feedbackComments && (
-                          <p className="mt-3 max-w-sm rounded-lg bg-[#eaf1f4] px-3 py-2 text-xs leading-5 text-[#42484a]">
+                          <p className="mt-3 max-w-[24rem] rounded-lg bg-[#eaf1f4] px-3 py-2 text-xs leading-5 text-[#42484a]">
                             <strong>Retroalimentación:</strong>{" "}
                             {delivery.feedbackComments}
                           </p>

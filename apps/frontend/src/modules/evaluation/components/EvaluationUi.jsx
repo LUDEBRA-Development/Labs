@@ -60,7 +60,7 @@ export function StatCard({ icon, label, value, tone = "primary" }) {
       </span>
       <div>
         <p className="technical-label text-[#5b6265]">{label}</p>
-        <p className="mt-1 font-display text-3xl font-semibold text-[#181c1e]">
+        <p className="evaluation-font-display mt-1 text-3xl font-semibold text-[#181c1e]">
           {value}
         </p>
       </div>
@@ -94,10 +94,10 @@ export function EmptyState({ title, description }) {
         <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#eaf1f4] text-[#00668a]">
           <Icon className="h-7 w-7" name="inbox" />
         </span>
-        <h3 className="mt-4 font-display text-lg font-semibold text-[#181c1e]">
+        <h3 className="evaluation-font-display mt-4 text-lg font-semibold text-[#181c1e]">
           {title}
         </h3>
-        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#5b6265]">
+        <p className="mx-auto mt-2 max-w-[28rem] text-sm leading-6 text-[#5b6265]">
           {description}
         </p>
       </div>

@@ -95,10 +95,10 @@ export function TeacherEvaluationPage() {
       <section className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="technical-label text-[#00668a]">Control académico</p>
-          <h1 className="mt-2 font-display text-[28px] font-semibold leading-9 tracking-tight text-[#181c1e] sm:text-4xl sm:leading-[44px]">
+          <h1 className="evaluation-font-display mt-2 text-[28px] font-semibold leading-9 tracking-tight text-[#181c1e] sm:text-4xl sm:leading-[44px]">
             Seguimiento de actividades
           </h1>
-          <p className="mt-3 max-w-2xl text-base leading-6 text-[#5b6265]">
+          <p className="mt-3 max-w-[42rem] text-base leading-6 text-[#5b6265]">
             Consulta las entregas registradas y completa el ciclo de evaluación
             con una calificación y retroalimentación.
           </p>
@@ -175,7 +175,7 @@ export function TeacherEvaluationPage() {
       <section className="academic-card overflow-hidden">
         <div className="border-b border-[#e0e3e5] px-6 py-6">
           <p className="technical-label text-[#00668a]">Evaluación docente</p>
-          <h2 className="mt-2 font-display text-2xl font-semibold text-[#181c1e] sm:text-[28px]">
+          <h2 className="evaluation-font-display mt-2 text-2xl font-semibold text-[#181c1e] sm:text-[28px]">
             Listado de estudiantes y calificaciones
           </h2>
           <p className="mt-2 text-sm leading-6 text-[#5b6265]">
@@ -291,7 +291,7 @@ export function TeacherEvaluationPage() {
                   <p className="technical-label text-[#00668a]">
                     Detalle de la entrega
                   </p>
-                  <h2 className="mt-2 font-display text-3xl font-semibold text-[#181c1e]">
+                  <h2 className="evaluation-font-display mt-2 text-3xl font-semibold text-[#181c1e]">
                     {selectedDelivery.task?.name ??
                       `Actividad ${selectedDelivery.idTask}`}
                   </h2>
@@ -300,7 +300,7 @@ export function TeacherEvaluationPage() {
                 <article className="academic-card flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
                   <Avatar email={selectedDelivery.emailUser} />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-display text-xl font-semibold text-[#181c1e]">
+                    <p className="evaluation-font-display truncate text-xl font-semibold text-[#181c1e]">
                       {selectedDelivery.emailUser}
                     </p>
                     <p className="mt-1 flex items-center gap-2 text-sm text-[#5b6265]">
@@ -335,7 +335,7 @@ export function TeacherEvaluationPage() {
                     Evaluación docente
                   </p>
                   <h2
-                    className="mt-2 font-display text-2xl font-semibold"
+                    className="evaluation-font-display mt-2 text-2xl font-semibold"
                     id="evaluation-panel-title"
                   >
                     Panel de calificación

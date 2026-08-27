@@ -1,11 +1,24 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import Sidebar from "./components/layout/Sidebar";
+import { CourseFormPage, CursosList } from "./cursos";
 import { Icon } from "./modules/evaluation/components/Icons";
 import { StudentEvaluationPage } from "./modules/evaluation/StudentEvaluationPage";
 import { TeacherEvaluationPage } from "./modules/evaluation/TeacherEvaluationPage";
 
-function App() {
+function AdminLayout({ children }) {
   return (
-    <div className="min-h-screen bg-[#f7fafc] text-[#181c1e]">
+    <div className="flex h-screen overflow-hidden bg-surface-bright">
+      <Sidebar />
+      <main className="ml-0 h-full flex-1 overflow-y-auto md:ml-[260px]">
+        {children}
+      </main>
+    </div>
+  );
+}
+
+function EvaluationLayout() {
+  return (
+    <div className="evaluation-shell min-h-screen bg-[#f7fafc] text-[#181c1e]">
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[#06222b] text-white shadow-[0_6px_24px_rgba(6,34,43,0.12)]">
         <div className="mx-auto flex min-h-20 max-w-[1440px] flex-wrap items-center gap-x-8 gap-y-3 px-4 py-4 sm:px-6 lg:px-10">
           <div className="mr-auto flex items-center gap-3">
@@ -13,7 +26,7 @@ function App() {
               <Icon className="h-6 w-6" name="flask" />
             </span>
             <div>
-              <p className="font-display text-lg font-bold tracking-tight">
+              <p className="evaluation-font-display text-lg font-bold tracking-tight">
                 LUDEBRA LABS
               </p>
               <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#86a0ac]">
@@ -55,23 +68,49 @@ function App() {
         <Routes>
           <Route
             element={<Navigate replace to="/evaluacion/estudiante" />}
-            path="/"
+            index
           />
-          <Route
-            element={<StudentEvaluationPage />}
-            path="/evaluacion/estudiante"
-          />
-          <Route
-            element={<TeacherEvaluationPage />}
-            path="/evaluacion/docente"
-          />
-          <Route
-            element={<Navigate replace to="/evaluacion/estudiante" />}
-            path="*"
-          />
+          <Route element={<StudentEvaluationPage />} path="estudiante" />
+          <Route element={<TeacherEvaluationPage />} path="docente" />
         </Routes>
       </main>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route element={<Navigate replace to="/admin/cursos" />} path="/" />
+
+      <Route
+        element={
+          <AdminLayout>
+            <CursosList />
+          </AdminLayout>
+        }
+        path="/admin/cursos"
+      />
+      <Route
+        element={
+          <AdminLayout>
+            <CourseFormPage />
+          </AdminLayout>
+        }
+        path="/admin/cursos/nuevo"
+      />
+      <Route
+        element={
+          <AdminLayout>
+            <CourseFormPage />
+          </AdminLayout>
+        }
+        path="/admin/cursos/:id/editar"
+      />
+
+      <Route element={<EvaluationLayout />} path="/evaluacion/*" />
+      <Route element={<Navigate replace to="/admin/cursos" />} path="*" />
+    </Routes>
   );
 }
 
