@@ -160,6 +160,44 @@ CREATE TABLE IF NOT EXISTS User_tasks (
 );
 
 -- ---------------------------------------------------------------------
+-- Configuración de evaluación por actividad (Módulo 4)
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS Task_evaluation_config (
+    Id_task          INT         NOT NULL,
+    Activity_code    VARCHAR(30) NOT NULL,
+    Rubric_criteria  JSON        NOT NULL,
+    PRIMARY KEY (Id_task),
+    UNIQUE KEY uk_task_evaluation_activity_code (Activity_code),
+    CONSTRAINT fk_task_evaluation_config_task
+        FOREIGN KEY (Id_task) REFERENCES tasks (Id_task)
+        ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+-- ---------------------------------------------------------------------
+-- Borradores y metadatos de calificación (Módulo 4)
+-- La nota publicada continúa almacenada en User_tasks.
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS User_task_evaluations (
+    email_User          VARCHAR(100) NOT NULL,
+    Id_task             INT          NOT NULL,
+    Draft_qualification DECIMAL(4,2),
+    Draft_feedback      VARCHAR(500),
+    Selected_criteria   JSON,
+    Status              VARCHAR(10)  NOT NULL,
+    Teacher_email       VARCHAR(100) NOT NULL,
+    Updated_at          DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+                                      ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (email_User, Id_task),
+    CONSTRAINT fk_user_task_evaluation_delivery
+        FOREIGN KEY (email_User, Id_task)
+        REFERENCES User_tasks (email_User, Id_task)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_user_task_evaluation_teacher
+        FOREIGN KEY (Teacher_email) REFERENCES Users (Email)
+        ON UPDATE CASCADE ON DELETE RESTRICT
+);
+
+-- ---------------------------------------------------------------------
 -- Archivos de tareas
 -- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS task_files (
@@ -266,6 +304,47 @@ INSERT INTO task_simulators (Id_task, Id_simulador) VALUES
 INSERT INTO User_tasks (email_User, Id_task, Delivery_date, Qualification, Qualification_date, Feedback_comments, Comment) VALUES
     ('estudiante@unicesar.edu.co', 1, '2026-03-10 14:23:00', 4.50, '2026-03-12 09:00:00', 'Buen manejo del instrumento. Revisar unidades.', 'Entrega práctica Coulomb'),
     ('estudiante@unicesar.edu.co', 2, '2026-04-08 18:45:00', NULL,  NULL, NULL,                  'Mapa de campo completado');
+
+-- Configuración de evaluación: código visible y rúbrica del docente
+INSERT INTO Task_evaluation_config (Id_task, Activity_code, Rubric_criteria) VALUES
+    (1, 'LAB-FIS-001', JSON_ARRAY(
+        JSON_OBJECT('id', 'theoretical-calculations', 'label', 'Precisión en cálculos teóricos'),
+        JSON_OBJECT('id', 'si-units', 'label', 'Correcto uso de unidades SI'),
+        JSON_OBJECT('id', 'charts-and-tables', 'label', 'Calidad de gráficas y tablas')
+    )),
+    (2, 'LAB-FIS-002', JSON_ARRAY(
+        JSON_OBJECT('id', 'theoretical-calculations', 'label', 'Precisión en cálculos teóricos'),
+        JSON_OBJECT('id', 'si-units', 'label', 'Correcto uso de unidades SI'),
+        JSON_OBJECT('id', 'charts-and-tables', 'label', 'Calidad de gráficas y tablas')
+    )),
+    (3, 'LAB-FIS-003', JSON_ARRAY(
+        JSON_OBJECT('id', 'theoretical-calculations', 'label', 'Precisión en cálculos teóricos'),
+        JSON_OBJECT('id', 'si-units', 'label', 'Correcto uso de unidades SI'),
+        JSON_OBJECT('id', 'charts-and-tables', 'label', 'Calidad de gráficas y tablas')
+    )),
+    (4, 'LAB-FIS-004', JSON_ARRAY(
+        JSON_OBJECT('id', 'theoretical-calculations', 'label', 'Precisión en cálculos teóricos'),
+        JSON_OBJECT('id', 'si-units', 'label', 'Correcto uso de unidades SI'),
+        JSON_OBJECT('id', 'charts-and-tables', 'label', 'Calidad de gráficas y tablas')
+    ));
+
+INSERT INTO User_task_evaluations (
+    email_User,
+    Id_task,
+    Draft_qualification,
+    Draft_feedback,
+    Selected_criteria,
+    Status,
+    Teacher_email
+) VALUES (
+    'estudiante@unicesar.edu.co',
+    1,
+    4.50,
+    'Buen manejo del instrumento. Revisar unidades.',
+    JSON_ARRAY('theoretical-calculations', 'charts-and-tables'),
+    'published',
+    'docente@unicesar.edu.co'
+);
 
 -- Archivos de tareas
 INSERT INTO task_files (Id_task, Url_file, File_name, File_type) VALUES

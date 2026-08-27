@@ -1,225 +1,284 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { getTasksByCourse, MOCK_COURSE } from "../api/tasks";
-import { getTaskDeliveries } from "../api/userTasks";
-import {
-  Breadcrumbs,
-  ErrorState,
-  LoadingState,
-  MockTasksNotice,
-  StatCard,
-} from "../components/EvaluationUi";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { getTeacherFollowUp } from "../api/userTasks";
+import { ErrorState, LoadingState } from "../components/EvaluationUi";
 import { Icon } from "../components/Icons";
 
-const dateFormatter = new Intl.DateTimeFormat("es-CO", {
-  dateStyle: "long",
-  timeStyle: "short",
-});
+function initials(name = "") {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
 
-function formatDate(value) {
-  return value ? dateFormatter.format(new Date(value)) : "Sin fecha límite";
+function gradeLabel(value, maxScore) {
+  if (value == null) return null;
+  return `${Number(value).toLocaleString("es-CO", {
+    maximumFractionDigits: 2,
+  })} / ${Number(maxScore).toLocaleString("es-CO", {
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+function StatusBadge({ status }) {
+  const styles = {
+    qualified: "bg-[#d9f3ff] text-[#004d6a]",
+    submitted: "bg-[#38c2ff] text-[#004d6a]",
+    not_submitted: "bg-[#ffdad6] text-[#93000a]",
+  };
+  const dots = {
+    qualified: "bg-[#00668a]",
+    submitted: "bg-white",
+    not_submitted: "bg-[#ba1a1a]",
+  };
+  const labels = {
+    qualified: "Calificado",
+    submitted: "Entregado",
+    not_submitted: "Sin entrega",
+  };
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${styles[status]}`}
+    >
+      <span className={`h-1.5 w-1.5 rounded-full ${dots[status]}`} />
+      {labels[status]}
+    </span>
+  );
 }
 
 export function TeacherActivitiesPage() {
-  const [activities, setActivities] = useState([]);
-  const [status, setStatus] = useState("loading");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialCode = searchParams.get("activityCode") ?? "";
+  const [activityCode, setActivityCode] = useState(initialCode);
+  const [followUp, setFollowUp] = useState(null);
+  const [status, setStatus] = useState(initialCode ? "loading" : "idle");
   const [error, setError] = useState("");
 
-  const loadActivities = useCallback(async () => {
+  const loadFollowUp = useCallback(async (code) => {
+    const normalizedCode = code.trim().toUpperCase();
+    if (!normalizedCode) {
+      setStatus("error");
+      setError("Ingresa el identificador de una actividad.");
+      return;
+    }
+
     setStatus("loading");
     setError("");
-
     try {
-      const tasks = await getTasksByCourse(MOCK_COURSE.idCourse);
-      const checkedAt = new Date();
-      const tasksWithDeliveries = await Promise.all(
-        tasks.map(async (task) => {
-          const deliveries = await getTaskDeliveries(task.idTask);
-          const qualified = deliveries.filter(
-            (delivery) => delivery.qualification != null,
-          ).length;
-
-          return {
-            ...task,
-            deliveryCount: deliveries.length,
-            qualifiedCount: qualified,
-            pendingCount: deliveries.length - qualified,
-            isExpired:
-              task.expirationDate &&
-              new Date(task.expirationDate).getTime() < checkedAt.getTime(),
-          };
-        }),
-      );
-
-      setActivities(tasksWithDeliveries);
+      const data = await getTeacherFollowUp(normalizedCode);
+      setFollowUp(data);
+      setActivityCode(data.activity.code);
+      setSearchParams({ activityCode: data.activity.code }, { replace: true });
       setStatus("success");
     } catch (loadError) {
+      setFollowUp(null);
       setError(loadError.message);
       setStatus("error");
     }
-  }, []);
+  }, [setSearchParams]);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(loadActivities, 0);
+    if (!initialCode) return undefined;
+    const timeoutId = window.setTimeout(() => loadFollowUp(initialCode), 0);
     return () => window.clearTimeout(timeoutId);
-  }, [loadActivities]);
+  }, [initialCode, loadFollowUp]);
 
-  const deliveryTotal = activities.reduce(
-    (total, task) => total + task.deliveryCount,
-    0,
-  );
-  const pendingTotal = activities.reduce(
-    (total, task) => total + task.pendingCount,
-    0,
-  );
+  function handleSearch(event) {
+    event.preventDefault();
+    loadFollowUp(activityCode);
+  }
+
+  const summary = followUp?.summary;
+  const activity = followUp?.activity;
+  const rows = useMemo(() => followUp?.students ?? [], [followUp]);
 
   return (
-    <div className="space-y-8 lg:space-y-10">
-      <Breadcrumbs current="Mis actividades" />
-
-      <section>
-        <p className="technical-label text-[#00668a]">Evaluación docente</p>
-        <h1 className="evaluation-font-display mt-2 text-[28px] font-semibold leading-9 tracking-tight text-[#181c1e] sm:text-4xl sm:leading-[44px]">
-          Mis actividades
+    <div className="space-y-8">
+      <header>
+        <nav className="flex flex-wrap items-center gap-2 text-sm text-[#42484a]">
+          <span>Página principal</span>
+          <span aria-hidden="true">›</span>
+          <span>Mis cursos</span>
+          <span aria-hidden="true">›</span>
+          <span className="font-medium text-[#06222b]">
+            {activity?.course.name ?? "Evaluación y seguimiento"}
+          </span>
+        </nav>
+        <h1 className="evaluation-font-display mt-5 text-[28px] font-semibold leading-9 text-[#06222b] sm:text-[32px] sm:leading-10">
+          Seguimiento de Curso
+          {activity?.course.name ? `: ${activity.course.name}` : ""}
         </h1>
-        <p className="mt-3 max-w-[42rem] text-base leading-6 text-[#5b6265]">
-          Selecciona una actividad para revisar sus entregas y completar la
-          evaluación de los estudiantes.
-        </p>
+      </header>
+
+      <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        <SummaryCard icon="users" label="Total estudiantes" tone="primary" value={summary?.totalStudents ?? "—"} />
+        <SummaryCard icon="clipboard" label="Entregas recibidas" tone="cyan" value={summary?.received ?? "—"} />
+        <SummaryCard icon="clock" label="Por calificar" tone="error" value={summary?.pendingQualification ?? "—"} />
+        <SummaryCard icon="calendar" label="Pendientes de entrega" tone="neutral" value={summary?.pendingDelivery ?? "—"} />
       </section>
 
-      <MockTasksNotice />
-
-      {status === "loading" && (
-        <section className="academic-card">
-          <LoadingState label="Cargando actividades y conteos de entrega…" />
-        </section>
-      )}
-
-      {status === "error" && (
-        <section className="academic-card">
-          <ErrorState message={error} onRetry={loadActivities} />
-        </section>
-      )}
-
-      {status === "success" && (
-        <>
-          <section className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            <StatCard
-              icon="fileText"
-              label="Actividades"
-              tone="primary"
-              value={activities.length}
+      <form className="academic-card p-5 sm:p-6" noValidate onSubmit={handleSearch}>
+        <label className="field-label text-[#1e3741]" htmlFor="activity-code">
+          Identificador de la actividad
+        </label>
+        <div className="mt-2 flex flex-col gap-4 sm:flex-row">
+          <div className="relative flex-1">
+            <Icon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#9aa1a4]" name="search" />
+            <input
+              autoComplete="off"
+              className="field-control field-control-embedded mt-0 h-13 uppercase"
+              id="activity-code"
+              onChange={(event) => setActivityCode(event.target.value)}
+              placeholder="Ej: LAB-FIS-001"
+              value={activityCode}
             />
-            <StatCard
-              icon="clipboard"
-              label="Entregas recibidas"
-              tone="cyan"
-              value={deliveryTotal}
-            />
-            <StatCard
-              icon="clock"
-              label="Por calificar"
-              tone="warning"
-              value={pendingTotal}
-            />
-          </section>
+          </div>
+          <button className="primary-button min-w-36 px-6" disabled={status === "loading"} type="submit">
+            {status === "loading" ? "Consultando…" : "Ver entregas"}
+          </button>
+        </div>
+      </form>
 
-          <section>
-            <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div className="min-w-0">
-                <p className="technical-label text-[#00668a]">
-                  {MOCK_COURSE.code}
-                </p>
-                <h2 className="evaluation-font-display mt-1 text-2xl font-semibold text-[#181c1e]">
-                  {MOCK_COURSE.name}
-                </h2>
-              </div>
-              <p className="font-mono text-xs text-[#72787b]">
-                Curso: {MOCK_COURSE.idCourse}
+      <section className="academic-card min-h-[400px] overflow-hidden">
+        <div className="flex flex-col gap-4 border-b border-[#e0e3e5] p-6 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="technical-label text-[#42484a]">Evaluación docente</p>
+            <h2 className="evaluation-font-display mt-2 text-2xl font-semibold text-[#06222b]">
+              Listado de Estudiantes y Calificaciones
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-[#42484a]">
+              Vista general del progreso académico de los estudiantes inscritos en el curso.
+            </p>
+          </div>
+          {activity && (
+            <div className="shrink-0 text-left sm:text-right">
+              <span className="inline-block rounded-full bg-[#f1f4f6] px-3 py-1 font-mono text-xs font-semibold text-[#1e3741]">
+                {activity.code}
+              </span>
+              <p className="mt-2 text-sm font-medium text-[#06222b]">{activity.name}</p>
+            </div>
+          )}
+        </div>
+
+        {status === "loading" && <LoadingState label="Cargando estudiantes, entregas y calificaciones…" />}
+        {status === "idle" && (
+          <div className="grid min-h-64 place-items-center px-6 py-12 text-center">
+            <div>
+              <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#eaf1f4] text-[#00668a]">
+                <Icon className="h-7 w-7" name="search" />
+              </span>
+              <p className="evaluation-font-display mt-4 text-xl font-semibold text-[#06222b]">
+                Consulta una actividad
+              </p>
+              <p className="mt-2 text-sm leading-6 text-[#72787b]">
+                Ingresa su código para cargar estudiantes, entregas y calificaciones.
               </p>
             </div>
-
-            <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
-              {activities.map((task) => {
-                return (
-                  <Link
-                    className="academic-card group flex min-h-72 flex-col overflow-hidden transition duration-200 hover:-translate-y-1 hover:shadow-[0_10px_32px_rgba(30,55,65,0.12)]"
-                    key={task.idTask}
-                    to={`/evaluacion/docente/actividades/${task.idTask}/entregas`}
-                  >
-                    <div className="flex items-start justify-between gap-4 bg-[#1e3741] px-6 py-5 text-white">
-                      <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/10 text-[#38c2ff]">
-                        <Icon className="h-6 w-6" name="fileText" />
-                      </span>
-                      <span
-                        className={`rounded-full px-3 py-1 font-mono text-xs ${
-                          task.isExpired
-                            ? "bg-[#ffdad6] text-[#93000a]"
-                            : "bg-[#d9f3ff] text-[#004d6a]"
-                        }`}
-                      >
-                        {task.isExpired ? "Finalizada" : "Activa"}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-1 flex-col p-6">
-                      <p className="font-mono text-xs font-medium text-[#00668a]">
-                        ACTIVIDAD #{task.idTask}
-                      </p>
-                      <h3 className="evaluation-font-display mt-2 text-xl font-semibold text-[#181c1e]">
-                        {task.name}
-                      </h3>
-                      <p className="mt-3 line-clamp-2 text-sm leading-6 text-[#5b6265]">
-                        {task.descriptions}
-                      </p>
-
-                      <div className="mt-5 flex items-center gap-2 text-sm text-[#42484a]">
-                        <Icon
-                          className="h-4 w-4 text-[#00668a]"
-                          name="calendar"
-                        />
-                        <span>
-                          Fecha límite: {formatDate(task.expirationDate)}
-                        </span>
-                      </div>
-
-                      <div className="mt-auto grid grid-cols-3 gap-2 border-t border-[#e0e3e5] pt-5 text-center">
-                        <div>
-                          <p className="font-mono text-lg font-semibold text-[#06222b]">
-                            {task.deliveryCount}
-                          </p>
-                          <p className="text-xs text-[#72787b]">Entregas</p>
-                        </div>
-                        <div>
-                          <p className="font-mono text-lg font-semibold text-[#15734b]">
-                            {task.qualifiedCount}
-                          </p>
-                          <p className="text-xs text-[#72787b]">Calificadas</p>
-                        </div>
-                        <div>
-                          <p className="font-mono text-lg font-semibold text-[#8a5a13]">
-                            {task.pendingCount}
-                          </p>
-                          <p className="text-xs text-[#72787b]">Pendientes</p>
-                        </div>
-                      </div>
-
-                      <span className="mt-5 inline-flex items-center justify-end gap-2 text-sm font-semibold text-[#00668a]">
-                        Ver entregas
-                        <Icon
-                          className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                          name="arrowRight"
-                        />
-                      </span>
-                    </div>
-                  </Link>
-                );
-              })}
+          </div>
+        )}
+        {status === "error" && <ErrorState message={error} onRetry={() => loadFollowUp(activityCode)} />}
+        {status === "success" && rows.length === 0 && (
+          <div className="grid min-h-60 place-items-center px-6 py-12 text-center">
+            <div>
+              <p className="evaluation-font-display text-xl font-semibold text-[#06222b]">No hay estudiantes inscritos</p>
+              <p className="mt-2 text-sm text-[#72787b]">Esta actividad pertenece a un curso sin matrículas activas.</p>
             </div>
-          </section>
-        </>
-      )}
+          </div>
+        )}
+
+        {status === "success" && rows.length > 0 && (
+          <div className="overflow-x-auto">
+            <table className="academic-table min-w-[850px]">
+              <thead>
+                <tr>
+                  <th>Estudiante</th>
+                  <th>Estado de actividad</th>
+                  <th>Calificación</th>
+                  <th className="text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.student.email}>
+                    <td>
+                      <div className="flex items-center gap-3">
+                        {row.student.profilePicture ? (
+                          <img alt="" className="h-9 w-9 rounded-full object-cover" src={row.student.profilePicture} />
+                        ) : (
+                          <span className="grid h-9 w-9 place-items-center rounded-full bg-[#c4e7ff] font-mono text-xs font-semibold text-[#004d6a]">
+                            {initials(row.student.name) || "ES"}
+                          </span>
+                        )}
+                        <div>
+                          <p className="font-medium text-[#06222b]">{row.student.name}</p>
+                          <p className="mt-0.5 text-xs text-[#42484a]">ID: {row.student.institutionalCode}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <StatusBadge status={row.status} />
+                      {row.hasDraft && row.status === "submitted" && (
+                        <p className="mt-1.5 text-xs text-[#8a5a13]">Borrador guardado</p>
+                      )}
+                    </td>
+                    <td>
+                      {row.status === "qualified" && (
+                        <span className="font-mono font-semibold text-[#06222b]">
+                          {gradeLabel(row.qualification, activity.maxScore)}
+                        </span>
+                      )}
+                      {row.status === "submitted" && <span className="italic text-[#42484a]">Pendiente</span>}
+                      {row.status === "not_submitted" && <span className="text-[#42484a]">-</span>}
+                    </td>
+                    <td className="text-right">
+                      {row.delivery ? (
+                        <Link
+                          className={row.status === "submitted" ? "primary-button min-h-0 px-4 py-2 text-sm" : "ghost-button font-mono text-sm"}
+                          to={`/evaluacion/docente/actividades/${activity.idTask}/entregas/${encodeURIComponent(row.student.email)}?activityCode=${encodeURIComponent(activity.code)}`}
+                        >
+                          {row.status === "submitted" ? "Calificar" : "Ver detalle"}
+                        </Link>
+                      ) : (
+                        <button
+                          className="ghost-button cursor-not-allowed font-mono text-sm text-[#72787b] opacity-70"
+                          disabled
+                          title="Las notificaciones todavía no están habilitadas"
+                          type="button"
+                        >
+                          Notificar
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
+  );
+}
+
+function SummaryCard({ icon, label, tone, value }) {
+  const tones = {
+    primary: { card: "border-l-[#1e3741] bg-white", icon: "text-[#1e3741]", value: "text-[#06222b]" },
+    cyan: { card: "border-l-[#00afeb] bg-white", icon: "text-[#00afeb]", value: "text-[#06222b]" },
+    error: { card: "border-l-[#ba1a1a] bg-[#ffdad6]", icon: "text-[#ba1a1a]", value: "text-[#93000a]" },
+    neutral: { card: "border-l-[#c2c7cb] bg-white", icon: "text-[#9aa1a4]", value: "text-[#06222b]" },
+  };
+  const style = tones[tone];
+
+  return (
+    <article className={`academic-card flex min-h-24 items-center gap-4 border-l-4 p-5 ${style.card}`}>
+      <Icon className={`h-6 w-6 shrink-0 ${style.icon}`} name={icon} />
+      <div>
+        <p className="technical-label text-[11px] text-[#42484a]">{label}</p>
+        <p className={`mt-1 font-mono text-2xl font-semibold ${style.value}`}>{value}</p>
+      </div>
+    </article>
   );
 }

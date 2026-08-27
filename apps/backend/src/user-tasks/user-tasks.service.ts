@@ -72,7 +72,9 @@ export class UserTasksService {
     const allowedExtensions = new Set(['.pdf', '.doc', '.docx']);
     const extension = extname(file.originalname).toLowerCase();
     if (!allowedExtensions.has(extension)) {
-      throw new BadRequestException('Solo se permiten archivos PDF, DOC o DOCX');
+      throw new BadRequestException(
+        'Solo se permiten archivos PDF, DOC o DOCX',
+      );
     }
 
     const delivery = await this.create(dto);

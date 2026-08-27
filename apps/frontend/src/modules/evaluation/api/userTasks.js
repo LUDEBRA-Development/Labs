@@ -18,23 +18,9 @@ export function getTaskDeliveries(taskId) {
 }
 
 export async function getDelivery(taskId, emailUser) {
-  const params = new URLSearchParams({
-    taskId: String(taskId),
-    email: emailUser,
-  });
-  const deliveries = await request(`/user-tasks?${params.toString()}`);
-
-  if (deliveries.length === 0) {
-    throw new Error("No existe una entrega registrada para este estudiante");
-  }
-
-  if (deliveries.length > 1) {
-    throw new Error(
-      "La consulta devolvió más de una entrega para la misma clave",
-    );
-  }
-
-  return deliveries[0];
+  return request(
+    `/user-tasks/${taskId}/${encodeURIComponent(emailUser)}`,
+  );
 }
 
 export function qualifyTask(taskId, emailUser, payload) {
@@ -45,4 +31,16 @@ export function qualifyTask(taskId, emailUser, payload) {
       body: JSON.stringify(payload),
     },
   );
+}
+
+export function saveEvaluationDraft(taskId, emailUser, payload) {
+  return request(`/user-tasks/${taskId}/${encodeURIComponent(emailUser)}/draft`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function getTeacherFollowUp(activityCode) {
+  const params = new URLSearchParams({ activityCode });
+  return request(`/user-tasks/follow-up?${params.toString()}`);
 }
