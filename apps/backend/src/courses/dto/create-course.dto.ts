@@ -1,4 +1,4 @@
-import { IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateCourseDto {
   @IsString()
@@ -12,6 +12,11 @@ export class CreateCourseDto {
   @IsString()
   @MaxLength(13)
   code!: string;
+
+  // Si se omite, el curso se guarda como "Activo" (se resuelve en el service).
+  @IsOptional()
+  @IsInt()
+  stateId?: number;
 
   @IsOptional()
   @IsString()
