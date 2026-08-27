@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { CursosList, CourseFormPage } from './cursos'
 import Sidebar from './components/layout/Sidebar'
+import { CrearActividadPage } from './actividades'
 
 function AdminLayout({ children }) {
   return (
@@ -43,9 +44,25 @@ function App() {
         }
       />
 
-      <Route path="*" element={<Navigate to="/admin/cursos" replace />} />
-    </Routes>
-  )
-}
+      // RUTAS PARA ACTIVIDADES (vista docente/admin)
+      <Route
+        path="/admin/cursos/:cursoId/actividades/nueva"
+        element={
+          <AdminLayout>
+            <CrearActividadPage />
+          </AdminLayout>
+        }
+      />
+
+
+
+
+
+
+
+            <Route path="*" element={<Navigate to="/admin/cursos" replace />} />
+          </Routes>
+        )
+      }
 
 export default App
