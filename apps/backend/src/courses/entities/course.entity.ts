@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { State } from '../../states/entities/state.entity';
 
 @Entity('courses')
 export class Course {
@@ -10,6 +11,10 @@ export class Course {
 
   @Column({ name: 'Code', length: 13 })
   code!: string;
+
+  @ManyToOne(() => State, { eager: false })
+  @JoinColumn({ name: 'Id_state' })
+  state!: State;
 
   @Column({ name: 'Description', length: 500, nullable: true })
   description!: string;
