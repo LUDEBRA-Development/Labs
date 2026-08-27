@@ -1,6 +1,10 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { CursosList, CourseFormPage } from './cursos'
 import Sidebar from './components/layout/Sidebar'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { CursosList, CourseFormPage } from './cursos'
+import Sidebar from './components/layout/Sidebar'
+import { CrearActividadPage } from './actividades'
 import { AuthProvider } from './context/AuthContext'
 import { useAuth } from './hooks/useAuth'
 import { ProtectedRoute, FullScreenSpinner } from './routes/ProtectedRoute'
@@ -13,7 +17,6 @@ import { UsersManagement } from './pages/admin/UsersManagement'
 import { TeacherDashboard } from './pages/teacher/TeacherDashboard'
 import { StudentSubjects } from './pages/student/StudentSubjects'
 import { NotFound } from './pages/NotFound'
-
 
 function AdminLayout({ children }) {
   return (
@@ -80,10 +83,21 @@ function App() {
         }
       />
 
+      {/* RUTAS PARA ACTIVIDADES (vista docente/admin) */}
+      <Route
+        path='/admin/cursos/:cursoId/actividades/nueva'
+        element={
+          <AdminLayout>
+            <CrearActividadPage />
+          </AdminLayout>
+        }
+      />
+
       <Route path='*' element={<Navigate to='/admin/cursos' replace />} />
     </Routes>
   )
 }
+
 
 function RootRedirect() {
   const { isAuthenticated, role, loading } = useAuth()
