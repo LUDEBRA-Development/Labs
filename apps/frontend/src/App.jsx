@@ -8,6 +8,7 @@ import { ROLE_HOME } from './routes/roleHome'
 import { AdminLayout } from './components/layout/AdminLayout'
 import { AppLayout } from './components/layout/AppLayout'
 import { Login } from './pages/auth/Login'
+import { Landing } from './pages/Landing'
 import { AdminDashboard } from './pages/admin/AdminDashboard'
 import { UsersManagement } from './pages/admin/UsersManagement'
 import { TeacherDashboard } from './pages/teacher/TeacherDashboard'
@@ -28,7 +29,8 @@ function App() {
       {/* ============================================================
           REDIRECCIÓN INICIAL (según rol)
       ============================================================ */}
-      <Route path='/' element={<RootRedirect />} />
+      {/* <Route path='/' element={<RootRedirect />} /> */}
+      <Route path='/' element={<Landing />} />
 
       {/* ============================================================
           RUTAS AUTENTICADAS — No-Admin (AppLayout sin sidebar)
@@ -97,7 +99,7 @@ function RootRedirect() {
   const { isAuthenticated, role, loading } = useAuth()
 
   if (loading) return <FullScreenSpinner />
-  if (!isAuthenticated) return <Navigate to='/login' replace />
+  if (!isAuthenticated) return <Landing />
   return <Navigate to={ROLE_HOME[role] ?? '/login'} replace />
 }
 
