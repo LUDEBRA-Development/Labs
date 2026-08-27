@@ -1,5 +1,13 @@
 import { useState } from "react";
 import { getStudentHistory, submitTask } from "./api";
+import {
+  Breadcrumbs,
+  EmptyState,
+  RoleSwitcher,
+  StatCard,
+  StatusBadge,
+} from "./components/EvaluationUi";
+import { Icon } from "./components/Icons";
 
 const dateFormatter = new Intl.DateTimeFormat("es-CO", {
   dateStyle: "medium",
@@ -17,6 +25,11 @@ export function StudentEvaluationPage() {
   const [history, setHistory] = useState([]);
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const qualifiedCount = history.filter(
+    (delivery) => delivery.qualification != null,
+  ).length;
+  const pendingCount = history.length - qualifiedCount;
 
   async function loadHistory() {
     if (!emailUser) return;
@@ -53,148 +66,215 @@ export function StudentEvaluationPage() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.4fr)]">
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-indigo-600">
-          Estudiante
-        </p>
-        <h1 className="mt-2 text-3xl font-bold text-slate-950">
-          Entregar actividad
-        </h1>
-        <p className="mt-3 text-sm leading-6 text-slate-600">
-          La plataforma validará automáticamente que la fecha límite no haya
-          vencido.
-        </p>
+    <div className="space-y-8 lg:space-y-10">
+      <Breadcrumbs current="Vista del estudiante" />
 
-        <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-          <label className="block text-sm font-medium text-slate-700">
-            Correo institucional
-            <input
-              className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-              type="email"
-              value={emailUser}
-              onChange={(event) => setEmailUser(event.target.value)}
-              required
-            />
-          </label>
-
-          <label className="block text-sm font-medium text-slate-700">
-            Identificador de la actividad
-            <input
-              className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-              type="number"
-              min="1"
-              value={taskId}
-              onChange={(event) => setTaskId(event.target.value)}
-              required
-            />
-          </label>
-
-          <label className="block text-sm font-medium text-slate-700">
-            Comentario de la entrega
-            <textarea
-              className="mt-2 min-h-32 w-full resize-y rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
-              maxLength="500"
-              value={comment}
-              onChange={(event) => setComment(event.target.value)}
-            />
-          </label>
-
-          <button
-            className="w-full rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={loading}
-            type="submit"
-          >
-            {loading ? "Procesando…" : "Registrar entrega"}
-          </button>
-        </form>
-
-        {feedback && (
-          <p
-            className={`mt-5 rounded-xl px-4 py-3 text-sm ${
-              feedback.type === "success"
-                ? "bg-emerald-50 text-emerald-800"
-                : "bg-rose-50 text-rose-800"
-            }`}
-            role="status"
-          >
-            {feedback.text}
+      <section className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p className="technical-label text-[#00668a]">Panel académico</p>
+          <h1 className="mt-2 font-display text-[28px] font-semibold leading-9 tracking-tight text-[#181c1e] sm:text-4xl sm:leading-[44px]">
+            Mis entregas y calificaciones
+          </h1>
+          <p className="mt-3 max-w-2xl text-base leading-6 text-[#5b6265]">
+            Registra una actividad dentro del plazo y consulta la
+            retroalimentación del docente.
           </p>
-        )}
+        </div>
+        <RoleSwitcher />
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-indigo-600">
-              Seguimiento
+      <section className="grid gap-4 sm:grid-cols-3">
+        <StatCard
+          icon="clipboard"
+          label="Entregas registradas"
+          tone="cyan"
+          value={history.length}
+        />
+        <StatCard
+          icon="award"
+          label="Actividades calificadas"
+          tone="success"
+          value={qualifiedCount}
+        />
+        <StatCard
+          icon="clock"
+          label="Pendientes de calificar"
+          tone="warning"
+          value={pendingCount}
+        />
+      </section>
+
+      {feedback && (
+        <div
+          className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-sm ${
+            feedback.type === "success"
+              ? "border-[#a9dfc5] bg-[#edf9f3] text-[#145c3d]"
+              : "border-[#ffb4ab] bg-[#ffdad6] text-[#93000a]"
+          }`}
+          role="status"
+        >
+          <span className="mt-0.5">
+            <Icon name={feedback.type === "success" ? "check" : "x"} />
+          </span>
+          <span>{feedback.text}</span>
+        </div>
+      )}
+
+      <div className="grid gap-6 xl:grid-cols-12">
+        <section className="academic-card overflow-hidden xl:col-span-5">
+          <div className="bg-[#1e3741] px-6 py-5 text-white">
+            <p className="font-mono text-xs uppercase tracking-[0.14em] text-[#86a0ac]">
+              Nueva entrega
             </p>
-            <h2 className="mt-2 text-2xl font-bold text-slate-950">
-              Historial de entregas
+            <h2 className="mt-2 font-display text-2xl font-semibold">
+              Registrar actividad
             </h2>
+            <p className="mt-2 text-sm leading-6 text-[#c4e7ff]">
+              La fecha y hora serán registradas automáticamente por el servidor.
+            </p>
           </div>
-          <button
-            className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-indigo-400 hover:text-indigo-700 disabled:opacity-60"
-            disabled={!emailUser || loading}
-            onClick={loadHistory}
-            type="button"
-          >
-            Actualizar historial
-          </button>
-        </div>
 
-        <div className="mt-6 space-y-4">
-          {history.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-slate-300 px-6 py-12 text-center text-sm text-slate-500">
-              Ingresa tu correo y consulta el historial.
+          <form className="space-y-5 p-6" onSubmit={handleSubmit}>
+            <label className="field-label">
+              Correo institucional
+              <input
+                autoComplete="email"
+                className="field-control"
+                placeholder="estudiante@unicesar.edu.co"
+                type="email"
+                value={emailUser}
+                onChange={(event) => setEmailUser(event.target.value)}
+                required
+              />
+              <span className="mt-2 block text-xs font-normal normal-case tracking-normal text-[#72787b]">
+                Se reemplazará por la sesión cuando esté disponible el acceso.
+              </span>
+            </label>
+
+            <label className="field-label">
+              Identificador de la actividad
+              <div className="relative mt-2">
+                <Icon
+                  className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#72787b]"
+                  name="search"
+                />
+                <input
+                  className="field-control field-control-embedded"
+                  min="1"
+                  placeholder="Ej: 12"
+                  type="number"
+                  value={taskId}
+                  onChange={(event) => setTaskId(event.target.value)}
+                  required
+                />
+              </div>
+            </label>
+
+            <label className="field-label">
+              Comentario de la entrega
+              <textarea
+                className="field-control min-h-32 resize-y"
+                maxLength="500"
+                placeholder="Describe brevemente los resultados o consideraciones de tu práctica."
+                value={comment}
+                onChange={(event) => setComment(event.target.value)}
+              />
+              <span className="mt-2 block text-right font-mono text-xs font-normal normal-case tracking-normal text-[#72787b]">
+                {comment.length}/500
+              </span>
+            </label>
+
+            <button
+              className="primary-button w-full"
+              disabled={loading}
+              type="submit"
+            >
+              <Icon name="clipboard" />
+              {loading ? "Procesando…" : "Registrar entrega"}
+            </button>
+          </form>
+        </section>
+
+        <section className="academic-card overflow-hidden xl:col-span-7">
+          <div className="flex flex-col gap-4 border-b border-[#e0e3e5] px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="technical-label text-[#00668a]">Seguimiento</p>
+              <h2 className="mt-2 font-display text-2xl font-semibold text-[#181c1e]">
+                Historial académico
+              </h2>
             </div>
-          ) : (
-            history.map((delivery) => (
-              <article
-                className="rounded-2xl border border-slate-200 p-5"
-                key={`${delivery.emailUser}-${delivery.idTask}`}
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h3 className="font-semibold text-slate-950">
-                      {delivery.task?.name ?? `Actividad ${delivery.idTask}`}
-                    </h3>
-                    <p className="mt-1 text-sm text-slate-500">
-                      Entregada: {formatDate(delivery.deliveryDate)}
-                    </p>
-                  </div>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      delivery.qualification == null
-                        ? "bg-amber-100 text-amber-800"
-                        : "bg-emerald-100 text-emerald-800"
-                    }`}
-                  >
-                    {delivery.qualification == null
-                      ? "Pendiente de calificar"
-                      : `${delivery.qualification} / ${delivery.task?.maxScore ?? 5}`}
-                  </span>
-                </div>
+            <button
+              className="secondary-button"
+              disabled={!emailUser || loading}
+              onClick={loadHistory}
+              type="button"
+            >
+              Actualizar historial
+            </button>
+          </div>
 
-                {delivery.comment && (
-                  <p className="mt-4 text-sm text-slate-600">
-                    <strong>Tu comentario:</strong> {delivery.comment}
-                  </p>
-                )}
-                {delivery.feedbackComments && (
-                  <div className="mt-4 rounded-xl bg-indigo-50 p-4 text-sm text-indigo-950">
-                    <strong>Retroalimentación docente:</strong>{" "}
-                    {delivery.feedbackComments}
-                    <p className="mt-1 text-xs text-indigo-700">
-                      Calificada: {formatDate(delivery.qualificationDate)}
-                    </p>
-                  </div>
-                )}
-              </article>
-            ))
+          {history.length === 0 ? (
+            <EmptyState
+              description="Ingresa tu correo institucional y consulta las actividades que ya has entregado."
+              title="Todavía no hay entregas para mostrar"
+            />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="academic-table min-w-[760px]">
+                <thead>
+                  <tr>
+                    <th>Actividad</th>
+                    <th>Entrega</th>
+                    <th>Estado</th>
+                    <th>Calificación</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.map((delivery) => (
+                    <tr key={`${delivery.emailUser}-${delivery.idTask}`}>
+                      <td>
+                        <p className="font-semibold text-[#181c1e]">
+                          {delivery.task?.name ??
+                            `Actividad ${delivery.idTask}`}
+                        </p>
+                        <p className="mt-1 font-mono text-xs text-[#72787b]">
+                          ID: {delivery.idTask}
+                        </p>
+                        {delivery.feedbackComments && (
+                          <p className="mt-3 max-w-sm rounded-lg bg-[#eaf1f4] px-3 py-2 text-xs leading-5 text-[#42484a]">
+                            <strong>Retroalimentación:</strong>{" "}
+                            {delivery.feedbackComments}
+                          </p>
+                        )}
+                      </td>
+                      <td className="text-sm text-[#42484a]">
+                        {formatDate(delivery.deliveryDate)}
+                      </td>
+                      <td>
+                        <StatusBadge
+                          qualified={delivery.qualification != null}
+                        />
+                      </td>
+                      <td>
+                        {delivery.qualification == null ? (
+                          <span className="italic text-[#72787b]">
+                            Pendiente
+                          </span>
+                        ) : (
+                          <span className="font-mono font-semibold text-[#06222b]">
+                            {delivery.qualification} /{" "}
+                            {delivery.task?.maxScore ?? 5}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
