@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { TasksController } from './tasks.controller';
 import { Task } from './entities/task.entity';
-import { Simulator } from 'src/simulators/entities/simulator.entity';
+import { Simulator } from '../simulators/entities/simulator.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SimulatorsModule } from 'src/simulators/simulators.module';
-import { State } from 'src/states/entities/state.entity';
-import { StatesModule } from 'src/states/states.module';
+import { SimulatorsModule } from '../simulators/simulators.module';
+import { State } from '../states/entities/state.entity';
+import { StatesModule } from '../states/states.module';
 
 @Module({
   imports: [

@@ -79,7 +79,7 @@ Labs/
 | Backend | NestJS 11, Node.js |
 | Frontend | React 19, Vite, React Router, Tailwind CSS 4 |
 | Control de versiones | Git + Gitflow |
-| Base de datos / ORM | *Por definir — se documentará aquí cuando se incorpore* |
+| Base de datos / ORM | MySQL + TypeORM |
 
 > Este proyecto reemplaza el stack original (React + JavaScript sin monorepo, sin backend propio documentado) por una arquitectura tipada y modular pensada para escalar en equipo.
 
@@ -174,9 +174,16 @@ Cada app que las necesite tendrá su propio archivo de ejemplo (`.env.example`) 
 
 ```bash
 cp apps/backend/.env.example apps/backend/.env
+cp apps/frontend/.env.example apps/frontend/.env
 ```
 
-> Se actualizará esta sección con las variables reales a medida que se agreguen (conexión a base de datos, puertos, claves, etc.).
+Configura en el backend la conexión MySQL (`MYSQL_HOST`, `MYSQL_PORT`,
+`MYSQL_DATABASE`, `MYSQL_USER` y `MYSQL_PASSWORD`). El frontend usa
+`VITE_API_URL` para localizar la API.
+
+La base de datos utiliza un esquema previamente creado por el equipo. El
+backend mantiene `synchronize: false` y no debe regenerar ni modificar sus
+tablas automáticamente.
 
 ### 5. Levantar el proyecto en desarrollo
 
@@ -299,13 +306,14 @@ Cualquier persona del equipo puede contribuir al proyecto, siempre dentro del fl
 - [ ] Módulo 2 — Cursos y Matrícula
 - [ ] Módulo 3 — Contenido y Actividades (incluye catálogo de simuladores)
 - [ ] Módulo 4 — Evaluación y Seguimiento
-- [ ] Definición de base de datos / ORM
+- [x] Definición de base de datos / ORM (MySQL + TypeORM)
 - [ ] Migración de simuladores del proyecto original
 - [ ] CI/CD y despliegue
 
 ## Documentación adicional
 
 - Documentación funcional original del proyecto (requerimientos, casos de uso, diagramas UML, mockups): ver documento de análisis y diseño de LUDEBRA Labs compartido por el equipo.
+- Integración, API y validación pendiente del [Módulo 4 — Evaluación y Seguimiento](docs/modulo-4-evaluacion-seguimiento.md).
 - Cada app (`apps/backend`, `apps/frontend`) mantiene su propio `README.md` con detalles específicos de configuración y ejecución.
 
 ## Equipo
