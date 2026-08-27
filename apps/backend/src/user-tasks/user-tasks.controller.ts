@@ -7,7 +7,10 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateUserTaskDto } from './dto/create-user-task.dto';
 import { ListUserTasksDto } from './dto/list-user-tasks.dto';
 import { QualifyUserTaskDto } from './dto/qualify-user-task.dto';
@@ -20,6 +23,15 @@ export class UserTasksController {
   @Post()
   create(@Body() dto: CreateUserTaskDto) {
     return this.userTasksService.create(dto);
+  }
+
+  @Post('submit')
+  @UseInterceptors(FileInterceptor('file'))
+  submit(
+    @Body() dto: CreateUserTaskDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.userTasksService.submit(dto, file);
   }
 
   @Patch(':idTask/:emailUser/qualification')
