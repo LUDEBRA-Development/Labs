@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { getTeacherFollowUp } from "../api/userTasks";
+import { getTeacherActivityCodes, getTeacherFollowUp } from "../api/userTasks";
 import { ErrorState, LoadingState } from "../components/EvaluationUi";
 import { Icon } from "../components/Icons";
 
@@ -56,6 +56,22 @@ export function TeacherActivitiesPage() {
   const [followUp, setFollowUp] = useState(null);
   const [status, setStatus] = useState(initialCode ? "loading" : "idle");
   const [error, setError] = useState("");
+  const [activities, setActivities] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [coursesLoading, setCoursesLoading] = useState(true);
+
+  const activityList = useMemo(() => activities, [activities]);
+  const courseList = useMemo(() => {
+    const unique = new Map();
+    activityList.forEach((activity) =>
+      unique.set(activity.course.idCourse, activity.course),
+    );
+    return [...unique.values()];
+  }, [activityList]);
+  const courseActivities = useMemo(
+    () => activityList.filter((a) => a.course.idCourse === selectedCourse),
+    [activityList, selectedCourse],
+  );
 
   const loadFollowUp = useCallback(async (code) => {
     const normalizedCode = code.trim().toUpperCase();
@@ -85,6 +101,40 @@ export function TeacherActivitiesPage() {
     const timeoutId = window.setTimeout(() => loadFollowUp(initialCode), 0);
     return () => window.clearTimeout(timeoutId);
   }, [initialCode, loadFollowUp]);
+
+  useEffect(() => {
+    let active = true;
+    getTeacherActivityCodes()
+      .then((data) => {
+        if (active) setActivities(data ?? []);
+      })
+      .catch(() => {
+        if (active) setActivities([]);
+      })
+      .finally(() => {
+        if (active) setCoursesLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!activityCode) return;
+    const match = activities.find((a) => a.code === activityCode);
+    if (match && match.course.idCourse !== selectedCourse) {
+      setSelectedCourse(match.course.idCourse);
+    }
+  }, [activityCode, activities, selectedCourse]);
+
+  function handleCourseChange(event) {
+    setSelectedCourse(event.target.value);
+  }
+
+  function handleActivitySelect(event) {
+    const code = event.target.value;
+    if (code) loadFollowUp(code);
+  }
 
   function handleSearch(event) {
     event.preventDefault();
@@ -121,8 +171,63 @@ export function TeacherActivitiesPage() {
       </section>
 
       <form className="academic-card p-5 sm:p-6" noValidate onSubmit={handleSearch}>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div>
+            <label className="field-label text-[#1e3741]" htmlFor="course-select">
+              Curso
+            </label>
+            <select
+              className="field-control field-control-embedded mt-2 w-full"
+              disabled={coursesLoading || courseList.length === 0}
+              id="course-select"
+              onChange={handleCourseChange}
+              value={selectedCourse}
+            >
+              <option value="">
+                {coursesLoading
+                  ? "Cargando cursos…"
+                  : courseList.length === 0
+                    ? "No tienes cursos con actividades"
+                    : "Selecciona un curso"}
+              </option>
+              {courseList.map((course) => (
+                <option key={course.idCourse} value={course.idCourse}>
+                  {course.name} ({course.code || course.idCourse})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="field-label text-[#1e3741]" htmlFor="task-select">
+              Actividad
+            </label>
+            <select
+              className="field-control field-control-embedded mt-2 w-full"
+              disabled={!selectedCourse}
+              id="task-select"
+              onChange={handleActivitySelect}
+              value={activityCode}
+            >
+              <option value="">
+                {selectedCourse
+                  ? courseActivities.length === 0
+                    ? "Este curso no tiene actividades"
+                    : "Selecciona una actividad"
+                  : "Primero selecciona un curso"}
+              </option>
+              {courseActivities.map((activity) => (
+                <option key={activity.idTask} value={activity.code}>
+                  {activity.name} — {activity.code}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="my-5 border-t border-[#e0e3e5]" />
+
         <label className="field-label text-[#1e3741]" htmlFor="activity-code">
-          Identificador de la actividad
+          O escribe el identificador de la actividad
         </label>
         <div className="mt-2 flex flex-col gap-4 sm:flex-row">
           <div className="relative flex-1">

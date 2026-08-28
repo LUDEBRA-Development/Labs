@@ -36,9 +36,17 @@ export function TeacherDashboard() {
           <p className="text-sm text-slate-500">Página principal › Mis cursos</p>
           <h1 className="text-2xl font-bold text-slate-800">Panel del docente</h1>
           <p className="text-slate-500">Cursos en los que estás asignado.</p>
-          <Link to="/campus/simuladores" className="mt-2 inline-flex text-sm font-medium text-sky-700 hover:underline">
-            Ver catálogo de simuladores disponibles para habilitar →
-          </Link>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <Link
+              to="/evaluacion/docente"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-sky-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-800"
+            >
+              Calificaciones y seguimiento
+            </Link>
+            <Link to="/campus/simuladores" className="inline-flex text-sm font-medium text-sky-700 hover:underline">
+              Ver catálogo de simuladores disponibles para habilitar →
+            </Link>
+          </div>
         </div>
         {error && <p className="rounded-lg bg-red-50 px-4 py-3 text-red-700">{error}</p>}
         {!error && courses.length === 0 && <p className="rounded-xl border border-slate-200 bg-white p-8 text-slate-500">No tienes cursos asignados.</p>}

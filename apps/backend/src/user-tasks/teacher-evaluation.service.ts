@@ -64,6 +64,51 @@ export class TeacherEvaluationService {
     private readonly userTasksService: UserTasksService,
   ) {}
 
+  async getTeacherActivityCodes(teacher: User) {
+    const teacherEmail = this.normalizeEmail(teacher.email);
+    const tasks = await this.taskRepository.find({
+      where: { createdById: teacherEmail },
+      order: { idTask: 'ASC' },
+    });
+    const configs = await this.configRepository.find();
+    const configByTask = new Map<number, TaskEvaluationConfig>(
+      configs.map((config) => [config.idTask, config]),
+    );
+
+    const activities: Array<{
+      idTask: number;
+      code: string;
+      name: string;
+      descriptions?: string;
+      expirationDate?: Date;
+      course: { idCourse: string; code?: string; name: string };
+    }> = [];
+    for (const task of tasks) {
+      const period = await this.periodRepository.findOne({
+        where: { idPeriod: task.periodId },
+        relations: { course: true },
+      });
+      if (!period?.course) continue;
+
+      const config = configByTask.get(task.idTask);
+      activities.push({
+        idTask: task.idTask,
+        code:
+          config?.activityCode ??
+          this.buildDefaultActivityCode(task, period.course),
+        name: task.name,
+        descriptions: task.descriptions,
+        expirationDate: task.expirationDate,
+        course: {
+          idCourse: period.course.idCourse,
+          code: period.course.code,
+          name: period.course.name,
+        },
+      });
+    }
+    return activities;
+  }
+
   async getFollowUp(activityCode: string, teacher: User) {
     const context = await this.findTaskByActivityCode(activityCode);
     this.assertTeacherOwnsTask(context.task, teacher);
@@ -362,18 +407,22 @@ export class TeacherEvaluationService {
   }
 
   private async createDefaultConfig(task: Task, course: Course) {
+    const config = this.configRepository.create({
+      idTask: task.idTask,
+      task,
+      activityCode: this.buildDefaultActivityCode(task, course),
+      rubricCriteria: DEFAULT_RUBRIC,
+    });
+    return this.configRepository.save(config);
+  }
+
+  private buildDefaultActivityCode(task: Task, course: Course) {
     const prefix =
       course.code
         ?.toUpperCase()
         .split(/[^A-Z0-9]+/)
         .find(Boolean) ?? 'ACT';
-    const config = this.configRepository.create({
-      idTask: task.idTask,
-      task,
-      activityCode: `LAB-${prefix}-${String(task.idTask).padStart(3, '0')}`,
-      rubricCriteria: DEFAULT_RUBRIC,
-    });
-    return this.configRepository.save(config);
+    return `LAB-${prefix}-${String(task.idTask).padStart(3, '0')}`;
   }
 
   private toActivitySummary({ task, course, config }: TaskContext) {
