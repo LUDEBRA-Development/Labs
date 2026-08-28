@@ -83,6 +83,13 @@ export class UserTasksController {
     );
   }
 
+  @Get('follow-up-codes')
+  @UseGuards(FirebaseAuthGuard, RolesGuard)
+  @Roles(Role.TEACHER)
+  getTeacherActivityCodes(@CurrentUser() teacher: User) {
+    return this.teacherEvaluationService.getTeacherActivityCodes(teacher);
+  }
+
   @Get('follow-up')
   @UseGuards(FirebaseAuthGuard, RolesGuard)
   @Roles(Role.TEACHER)

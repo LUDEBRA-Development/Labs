@@ -40,6 +40,10 @@ export function saveEvaluationDraft(taskId, emailUser, payload) {
   });
 }
 
+export function getTeacherActivityCodes() {
+  return request(`/user-tasks/follow-up-codes`);
+}
+
 export function getTeacherFollowUp(activityCode) {
   const params = new URLSearchParams({ activityCode });
   return request(`/user-tasks/follow-up?${params.toString()}`);

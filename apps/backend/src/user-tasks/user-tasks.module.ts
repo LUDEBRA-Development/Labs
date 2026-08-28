@@ -5,6 +5,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { Task } from '../tasks/entities/task.entity';
 import { AuthModule } from '../auth/auth.module';
+import { UsersModule } from '../users/users.module';
 import { Course } from '../courses/entities/course.entity';
 import { Period } from '../courses/entities/period.entity';
 import { UserCourse } from '../courses/entities/user-course.entity';
@@ -31,6 +32,7 @@ import { UserTasksService } from './user-tasks.service';
       User,
     ]),
     AuthModule,
+    UsersModule,
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads/deliveries',
